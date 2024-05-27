@@ -1,0 +1,9 @@
+{
+  "Tron-Main": {
+    "type": "Tron",
+    "tronscanHostname": "https://tronscan.org",
+    "tronWebConfig": {
+      "fullHost": "https://api.trongrid.io"
+    }
+  }
+}

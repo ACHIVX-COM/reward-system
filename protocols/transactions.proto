@@ -1,0 +1,248 @@
+syntax = "proto3";
+
+package achivx.transactions;
+
+service Transactions {
+  /**
+   * Pay specified amount of internal tokens to given account.
+   *
+   * Creates a transaction and returns it's details.
+   */
+  rpc PayToAccount(AccountPaymentRequest) returns (TransactionDetails);
+
+  /**
+   * Get detailed information about single transaction.
+   */
+  rpc GetTransactionDetails(TransactionDetailsRequest) returns (TransactionDetails);
+
+  /**
+   * Get multiple transactions matching specified conditions.
+   */
+  rpc GetTransactionsList(TransactionListRequest) returns (stream TransactionDetails);
+
+  /**
+   * Approve a transaction currently in HOLD status.
+   * 
+   * This will change transaction's status to either PAID or APPROVED, depending on if the transaction requires any blockchain operations.
+   */
+  rpc ApproveTransaction(TransactionApprovalRequest) returns (TransactionDetails);
+
+  /**
+   * Deny a transaction currently in HOLD status.
+   *
+   * This will change transaction's status to DENIED.
+   */
+  rpc DenyTransaction(TransactionDenialRequest) returns (TransactionDetails);
+
+  /**
+   * Request withdrawal of tokens.
+   *
+   * In case of success, it creates a transaction in HOLD status and returns it's details.
+   * The transaction can then be either approved or denied using ApproveTransaction or DenyTransaction procedures.
+   * When approved, the transaction will have APPROVED status and will wait for blockchain operations to be performed.
+   */
+  rpc RequestWithdrawal(WithdrawalRequest) returns (TransactionDetails);
+
+  /**
+   * Update status of a withdrawal transaction in SENDING or SEND_UNKNOWN_ERROR statuses.
+   *
+   * This procedure can be used to:
+   * - restore transaction after an unknown error which cannot be handled automatically happend while sending it to
+   *   blockchain (status SEND_UNKNOWN_ERROR)
+   * - notify system about change of blockchain transaction status change before it is detected automatically or when
+   *   it could not be detected automatically (status SENDING)
+   */
+  rpc RestoreWithdrawalStatus(WithdrawalRestorationRequest) returns (TransactionDetails);
+}
+
+enum TransactionStatus {
+  /**
+   * Transaction does not have associated blockchain operations and was performed successfully.
+   */
+  PAID = 0;
+  /**
+   * Transaction was created but requires confirmation.
+   * 
+   * Transaction from this status can also be safely cancelled (by changing status to DENIED).
+   */
+  HOLD = 1;
+  /**
+   * Transaction was cancelled.
+   */
+  DENIED = 2;
+  /**
+   * Transaction was approved but requires associated blockchain operations to be performed.
+   */
+  APPROVED = 3;
+  /**
+   * Associated blockchain operations are being performed with no known result yet.
+   */
+  SENDING = 4;
+  /**
+   * The transaction was approved but attempt to send associated operation to blockchain failed and should be retried again.
+   */
+  SEND_FAILED = 5;
+  /**
+   * The transaction was approved but attempt to send associated operation to blockchain ended with unknown result.
+   * 
+   * This status requires manual update of transaction status after check of blockchain content.
+   */
+  SEND_UNKNOWN_ERROR = 6;
+  /**
+   * Transaction did require associated blockchain operations but now they're completed.
+   */
+  MINED = 7;
+}
+
+// Key-value pair for transaction metadata.
+//
+// TODO: This is necessary 'cause grpc-node + @grpc/reflection + grpcurl don't work well together when there are maps in protocol definition. 
+message MetadataEntry {
+  string name = 1;
+  string value = 2;
+}
+
+message TransactionWithdrawalDetails {
+  // True iff this is a withdrawal transaction
+  bool isWithdrawal = 1;
+
+  // Name of target currency the user receives in exchange for internal tokens
+  string currencyId = 2;
+
+  // Address to withdraw tokens to
+  //
+  // This is user's withdrawal wallet for blockchain network corresponding to the target currency.
+  // It is stored at the moment of withdrawal transaction createion and cannot be changed later.
+  string withdrawalAddress = 3;
+
+  // How much of target currency the user receives
+  string amount = 4;
+
+  // Id/hash of the transaction
+  string transactionId = 5;
+
+  // URL of the transaction in blockchain explorer such as tronscan or etherscan
+  string transactionUrl = 6;
+
+  // Text of the last error
+  string error = 7;
+}
+
+message TransactionDetails {
+  // Id of transaction.
+  string id = 1;
+
+  // Id of account.
+  string account = 2;
+
+  // Amount of account's balance change.
+  string amount = 3;
+
+  // Current status of the transaction.
+  TransactionStatus status = 4;
+
+  // Metadata of the transaction.
+  //
+  // Metadata can be used to store additional information about transaction.
+  // E.g.:
+  // - a flag that indicates that a transaction is a reward for certain action
+  // - identifier of what action is this reward given for
+  repeated MetadataEntry meta = 5;
+
+  // Transaction creation timestamp.
+  //
+  // Represented as ISO-8601 string.
+  string timestamp = 6;
+
+  // If this transaction is a withdrawal transaction - contains withdrawal-related data
+  TransactionWithdrawalDetails withdrawal = 7;
+}
+
+message TransactionDetailsRequest {
+  string id = 1;
+}
+
+message AccountPaymentRequest {
+  // Id of account to pay to
+  string account = 1;
+
+  // How much tokens should the account receive.
+  //
+  // Must be a positive number.
+  string amount = 2;
+
+  // Initial status of transaction.
+  //
+  // Acceptable statuses are HOLD, PAID. The transaction will not be created and invalid argument error will be returned if any other status is provided.
+  //
+  // If not provided, transaction will be created as PAID.
+  TransactionStatus status = 3;
+
+  // Metadata to attach to the transaction.
+  repeated MetadataEntry meta = 4;
+}
+
+message TransactionListRequest {
+  // Number of matching transactions from beginning of list to skip.
+  int64 offset = 1;
+
+  // Max. number of transactions to return.
+  //
+  // If 0 or missing, all matching transactions will be returned.
+  int64 limit = 2;
+
+  // Return only transactions for given account
+  string account = 3;
+
+  // Return only transactions in one of these statuses.
+  //
+  // If no statuses are given here - transactions in any status will be returned.
+  repeated TransactionStatus includeStatuses = 4;
+
+  // Return only transactions that are (or are not) withdrawal transactions.
+  //
+  // If omitted, both withdrawal and non-withdrawal transactions will be returned.
+  optional bool isWithdrawal = 5;
+}
+
+message TransactionApprovalRequest {
+  // Id of transaction to approve
+  string id = 1;
+}
+
+message TransactionDenialRequest {
+  // Id of transaction to deny
+  string id = 1;
+}
+
+message WithdrawalRequest {
+  // Id of an account requesting withdrawal.
+  string account = 1;
+
+  // Id of blockchain currency/token to use.
+  string currency = 2;
+
+  // Cost of one unit of target currency in internal tokens.
+  string rate = 3;
+
+  // Amount of internal tokens to withdraw.
+  //
+  // If omitted, all available tokens will be withdrawn.
+  string amount = 4;
+
+  // Metadata to add to withdrawal transaction.
+  repeated MetadataEntry meta = 5;
+}
+
+message WithdrawalRestorationRequest {
+  // Id of the transaction.
+  string id = 1;
+
+  // New transaction status.
+  //
+  // Should be either:
+  // - SEND_FAILED if transaction has failed and should be re-sent
+  // - DENIED if the transaction has failed an should not be re-sent
+  // - MINED if the transaction has succeed
+  TransactionStatus status = 2;
+}

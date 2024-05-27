@@ -1,0 +1,317 @@
+[
+  {
+    "outputs": [
+      { "name": "receiver", "type": "address" },
+      { "name": "value", "type": "uint256" }
+    ],
+    "constant": true,
+    "inputs": [{ "type": "bytes32" }],
+    "name": "pendingPrintMap",
+    "stateMutability": "View",
+    "type": "Function"
+  },
+  {
+    "outputs": [{ "name": "lockId", "type": "bytes32" }],
+    "inputs": [{ "name": "_proposedCustodian", "type": "address" }],
+    "name": "requestCustodianChange",
+    "stateMutability": "Nonpayable",
+    "type": "Function"
+  },
+  {
+    "outputs": [{ "type": "address" }],
+    "constant": true,
+    "name": "trc20Proxy",
+    "stateMutability": "View",
+    "type": "Function"
+  },
+  {
+    "outputs": [{ "type": "address" }],
+    "constant": true,
+    "name": "custodian",
+    "stateMutability": "View",
+    "type": "Function"
+  },
+  {
+    "inputs": [{ "name": "_lockId", "type": "bytes32" }],
+    "name": "confirmCustodianChange",
+    "stateMutability": "Nonpayable",
+    "type": "Function"
+  },
+  {
+    "outputs": [{ "type": "address" }],
+    "constant": true,
+    "name": "trc20Store",
+    "stateMutability": "View",
+    "type": "Function"
+  },
+  {
+    "outputs": [{ "type": "address" }],
+    "constant": true,
+    "name": "sweeper",
+    "stateMutability": "View",
+    "type": "Function"
+  },
+  {
+    "outputs": [{ "type": "uint256" }],
+    "constant": true,
+    "name": "lockRequestCount",
+    "stateMutability": "View",
+    "type": "Function"
+  },
+  {
+    "outputs": [{ "name": "proposedNew", "type": "address" }],
+    "constant": true,
+    "inputs": [{ "type": "bytes32" }],
+    "name": "custodianChangeReqs",
+    "stateMutability": "View",
+    "type": "Function"
+  },
+  {
+    "outputs": [{ "type": "bytes32" }],
+    "constant": true,
+    "name": "sweepMsg",
+    "stateMutability": "View",
+    "type": "Function"
+  },
+  {
+    "outputs": [{ "type": "bool" }],
+    "constant": true,
+    "inputs": [{ "type": "address" }],
+    "name": "blocked",
+    "stateMutability": "View",
+    "type": "Function"
+  },
+  {
+    "outputs": [{ "type": "bool" }],
+    "constant": true,
+    "inputs": [{ "type": "address" }],
+    "name": "sweptSet",
+    "stateMutability": "View",
+    "type": "Function"
+  },
+  {
+    "inputs": [
+      { "name": "_TRC20Proxy", "type": "address" },
+      { "name": "_TRC20Store", "type": "address" },
+      { "name": "_custodian", "type": "address" },
+      { "name": "_sweeper", "type": "address" }
+    ],
+    "stateMutability": "Nonpayable",
+    "type": "Constructor"
+  },
+  {
+    "inputs": [
+      { "name": "_lockId", "type": "bytes32" },
+      { "name": "_receiver", "type": "address" },
+      { "name": "_value", "type": "uint256" }
+    ],
+    "name": "PrintingLocked",
+    "type": "Event"
+  },
+  {
+    "inputs": [
+      { "name": "_lockId", "type": "bytes32" },
+      { "name": "_receiver", "type": "address" },
+      { "name": "_value", "type": "uint256" }
+    ],
+    "name": "PrintingConfirmed",
+    "type": "Event"
+  },
+  {
+    "inputs": [
+      { "name": "_from", "type": "address" },
+      { "name": "_value", "type": "uint256" },
+      { "name": "_burned", "type": "uint256" },
+      { "name": "_balance", "type": "uint256" }
+    ],
+    "name": "Wiped",
+    "type": "Event"
+  },
+  {
+    "inputs": [
+      { "name": "_lockId", "type": "bytes32" },
+      { "name": "_msgSender", "type": "address" },
+      { "name": "_proposedCustodian", "type": "address" }
+    ],
+    "name": "CustodianChangeRequested",
+    "type": "Event"
+  },
+  {
+    "inputs": [
+      { "name": "_lockId", "type": "bytes32" },
+      { "name": "_newCustodian", "type": "address" }
+    ],
+    "name": "CustodianChangeConfirmed",
+    "type": "Event"
+  },
+  {
+    "outputs": [{ "name": "success", "type": "bool" }],
+    "inputs": [
+      { "name": "_sender", "type": "address" },
+      { "name": "_spender", "type": "address" },
+      { "name": "_value", "type": "uint256" }
+    ],
+    "name": "approveWithSender",
+    "stateMutability": "Nonpayable",
+    "type": "Function"
+  },
+  {
+    "outputs": [{ "name": "success", "type": "bool" }],
+    "inputs": [
+      { "name": "_sender", "type": "address" },
+      { "name": "_spender", "type": "address" },
+      { "name": "_addedValue", "type": "uint256" }
+    ],
+    "name": "increaseApprovalWithSender",
+    "stateMutability": "Nonpayable",
+    "type": "Function"
+  },
+  {
+    "outputs": [{ "name": "success", "type": "bool" }],
+    "inputs": [
+      { "name": "_sender", "type": "address" },
+      { "name": "_spender", "type": "address" },
+      { "name": "_subtractedValue", "type": "uint256" }
+    ],
+    "name": "decreaseApprovalWithSender",
+    "stateMutability": "Nonpayable",
+    "type": "Function"
+  },
+  {
+    "outputs": [{ "name": "lockId", "type": "bytes32" }],
+    "inputs": [
+      { "name": "_receiver", "type": "address" },
+      { "name": "_value", "type": "uint256" }
+    ],
+    "name": "requestPrint",
+    "stateMutability": "Nonpayable",
+    "type": "Function"
+  },
+  {
+    "inputs": [{ "name": "_lockId", "type": "bytes32" }],
+    "name": "confirmPrint",
+    "stateMutability": "Nonpayable",
+    "type": "Function"
+  },
+  {
+    "outputs": [{ "name": "success", "type": "bool" }],
+    "inputs": [{ "name": "_value", "type": "uint256" }],
+    "name": "burn",
+    "stateMutability": "Nonpayable",
+    "type": "Function"
+  },
+  {
+    "outputs": [{ "name": "success", "type": "bool" }],
+    "inputs": [
+      { "name": "_from", "type": "address" },
+      { "name": "_value", "type": "uint256" }
+    ],
+    "name": "burn",
+    "stateMutability": "Nonpayable",
+    "type": "Function"
+  },
+  {
+    "outputs": [{ "name": "success", "type": "bool" }],
+    "inputs": [
+      { "name": "_tos", "type": "address[]" },
+      { "name": "_values", "type": "uint256[]" }
+    ],
+    "name": "batchTransfer",
+    "stateMutability": "Nonpayable",
+    "type": "Function"
+  },
+  {
+    "inputs": [
+      { "name": "_vs", "type": "uint8[]" },
+      { "name": "_rs", "type": "bytes32[]" },
+      { "name": "_ss", "type": "bytes32[]" },
+      { "name": "_to", "type": "address" }
+    ],
+    "name": "enableSweep",
+    "stateMutability": "Nonpayable",
+    "type": "Function"
+  },
+  {
+    "inputs": [
+      { "name": "_froms", "type": "address[]" },
+      { "name": "_to", "type": "address" }
+    ],
+    "name": "replaySweep",
+    "stateMutability": "Nonpayable",
+    "type": "Function"
+  },
+  {
+    "outputs": [{ "name": "success", "type": "bool" }],
+    "inputs": [
+      { "name": "_sender", "type": "address" },
+      { "name": "_from", "type": "address" },
+      { "name": "_to", "type": "address" },
+      { "name": "_value", "type": "uint256" }
+    ],
+    "name": "transferFromWithSender",
+    "stateMutability": "Nonpayable",
+    "type": "Function"
+  },
+  {
+    "outputs": [{ "name": "success", "type": "bool" }],
+    "inputs": [
+      { "name": "_sender", "type": "address" },
+      { "name": "_to", "type": "address" },
+      { "name": "_value", "type": "uint256" }
+    ],
+    "name": "transferWithSender",
+    "stateMutability": "Nonpayable",
+    "type": "Function"
+  },
+  {
+    "outputs": [{ "name": "success", "type": "bool" }],
+    "inputs": [
+      { "name": "_from", "type": "address" },
+      { "name": "_to", "type": "address" },
+      { "name": "_value", "type": "uint256" }
+    ],
+    "name": "forceTransfer",
+    "stateMutability": "Nonpayable",
+    "type": "Function"
+  },
+  {
+    "outputs": [{ "type": "uint256" }],
+    "constant": true,
+    "name": "totalSupply",
+    "stateMutability": "View",
+    "type": "Function"
+  },
+  {
+    "outputs": [{ "name": "balance", "type": "uint256" }],
+    "constant": true,
+    "inputs": [{ "name": "_owner", "type": "address" }],
+    "name": "balanceOf",
+    "stateMutability": "View",
+    "type": "Function"
+  },
+  {
+    "outputs": [{ "name": "remaining", "type": "uint256" }],
+    "constant": true,
+    "inputs": [
+      { "name": "_owner", "type": "address" },
+      { "name": "_spender", "type": "address" }
+    ],
+    "name": "allowance",
+    "stateMutability": "View",
+    "type": "Function"
+  },
+  {
+    "outputs": [{ "name": "success", "type": "bool" }],
+    "inputs": [{ "name": "wallet", "type": "address" }],
+    "name": "blockWallet",
+    "stateMutability": "Nonpayable",
+    "type": "Function"
+  },
+  {
+    "outputs": [{ "name": "success", "type": "bool" }],
+    "inputs": [{ "name": "wallet", "type": "address" }],
+    "name": "unblockWallet",
+    "stateMutability": "Nonpayable",
+    "type": "Function"
+  }
+]

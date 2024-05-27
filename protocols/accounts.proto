@@ -1,0 +1,64 @@
+
+syntax = "proto3";
+
+package achivx.accounts;
+
+service Accounts {
+    // Returns detailed information about single account.
+    //
+    // Responds with not found error code if the account was not created in the system.
+    rpc GetAccountDetails(AccountDetailsRequest) returns (AccountDetailsResponse) {}
+
+    // Adds account to the system.
+    //
+    // Must be called for each account before performing any other actions (such as AddWithdrawalAddress, Transactions.PayToAccount, etc.) with it.
+    //
+    // This procedure is idempotent - repeated calls with the same account id are allowed.
+    rpc UpsertAccount(AccountUpsertRequest) returns (AccountDetailsResponse) {}
+
+    // Add a withdrawal wallet address to an account.
+    rpc AddWithdrawalAddress(WithdrawalAddressAddRequest) returns (AccountDetailsResponse);
+}
+
+message WithdrawalAddress {
+    // Name of blockchain this address is meant for
+    string network = 1;
+
+    // The address represented as string.
+    //
+    // Address format is different for different networks.
+    string address = 2;
+}
+
+message WithdrawalAddressAddRequest {
+    string account = 1;
+
+    string network = 2;
+
+    string address = 3;
+}
+
+// A request to get detailed account info.
+message AccountDetailsRequest {
+    string id = 1;
+}
+
+message AccountDetailsResponse {
+    string id = 1;
+
+    // Balance of account's internal wallet.
+    string balance = 2;
+
+    // Blockchain addresses this account uses to withdraw tokens.
+    repeated WithdrawalAddress withdrawalAddresses = 3;
+}
+
+message AccountUpsertRequest {
+    // Identifier of the account.
+    //
+    // Use stringified form of any type of identifier your system uses.
+    //
+    // Note that even if the account identifiers are numbers, they are still compared as strings.
+    // So, for example "1", "01", "1.0" are three different account identifiers.
+    string id = 1;
+}

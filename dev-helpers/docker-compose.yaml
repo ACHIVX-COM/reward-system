@@ -1,0 +1,45 @@
+version: "3.9"
+name: achivx-reward-system
+services:
+  mongodb:
+    hostname: mongodb
+    image: mongo:7.0
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.runCommand('ping')"]
+      interval: 15s
+      timeout: 30s
+      retries: 5
+    ports:
+      - 27017:27017
+    command: mongod --replSet rs0 --bind_ip_all
+    volumes:
+      - mongodbdata:/data/db
+  configuremongoreplset:
+    image: mongo:7.0
+    depends_on:
+      mongodb:
+        condition: service_healthy
+    links:
+      - mongodb
+    volumes:
+      - .:/tools
+    environment:
+      - REPL_SET=rs0
+      - MONGOD_MASTER_HOSTNAME=mongodb
+    entrypoint: ["/tools/setup-replica-set.sh"]
+  reward-system:
+    profiles: ["build"]
+    depends_on:
+      configuremongoreplset:
+        condition: service_completed_successfully
+    build:
+      context: ..
+    environment:
+      - MONGODB_URI=mongodb://mongodb/achivx-reward-system
+      - AUTH_TOKEN=${AUTH_TOKEN}
+      - TRON_PRIVATE_KEY=${TRON_PRIVATE_KEY}
+    ports:
+      - 50051:50051
+volumes:
+  mongodbdata:
+    driver: local

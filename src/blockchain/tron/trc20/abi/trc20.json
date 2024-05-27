@@ -1,0 +1,245 @@
+[
+  {
+    "outputs": [{ "type": "string" }],
+    "constant": true,
+    "name": "name",
+    "stateMutability": "View",
+    "type": "Function"
+  },
+  {
+    "outputs": [{ "name": "lockId", "type": "bytes32" }],
+    "inputs": [{ "name": "_proposedCustodian", "type": "address" }],
+    "name": "requestCustodianChange",
+    "stateMutability": "Nonpayable",
+    "type": "Function"
+  },
+  {
+    "outputs": [{ "type": "address" }],
+    "constant": true,
+    "name": "trc20Impl",
+    "stateMutability": "View",
+    "type": "Function"
+  },
+  {
+    "outputs": [{ "type": "uint8" }],
+    "constant": true,
+    "name": "decimals",
+    "stateMutability": "View",
+    "type": "Function"
+  },
+  {
+    "outputs": [{ "type": "address" }],
+    "constant": true,
+    "name": "custodian",
+    "stateMutability": "View",
+    "type": "Function"
+  },
+  {
+    "inputs": [{ "name": "_lockId", "type": "bytes32" }],
+    "name": "confirmCustodianChange",
+    "stateMutability": "Nonpayable",
+    "type": "Function"
+  },
+  {
+    "outputs": [{ "name": "lockId", "type": "bytes32" }],
+    "inputs": [{ "name": "_proposedImpl", "type": "address" }],
+    "name": "requestImplChange",
+    "stateMutability": "Nonpayable",
+    "type": "Function"
+  },
+  {
+    "inputs": [{ "name": "_lockId", "type": "bytes32" }],
+    "name": "confirmImplChange",
+    "stateMutability": "Nonpayable",
+    "type": "Function"
+  },
+  {
+    "outputs": [{ "type": "string" }],
+    "constant": true,
+    "name": "symbol",
+    "stateMutability": "View",
+    "type": "Function"
+  },
+  {
+    "outputs": [{ "name": "proposedNew", "type": "address" }],
+    "constant": true,
+    "inputs": [{ "type": "bytes32" }],
+    "name": "implChangeReqs",
+    "stateMutability": "View",
+    "type": "Function"
+  },
+  {
+    "outputs": [{ "type": "uint256" }],
+    "constant": true,
+    "name": "lockRequestCount",
+    "stateMutability": "View",
+    "type": "Function"
+  },
+  {
+    "outputs": [{ "name": "proposedNew", "type": "address" }],
+    "constant": true,
+    "inputs": [{ "type": "bytes32" }],
+    "name": "custodianChangeReqs",
+    "stateMutability": "View",
+    "type": "Function"
+  },
+  {
+    "inputs": [
+      { "name": "_name", "type": "string" },
+      { "name": "_symbol", "type": "string" },
+      { "name": "_decimals", "type": "uint8" },
+      { "name": "_custodian", "type": "address" }
+    ],
+    "stateMutability": "Nonpayable",
+    "type": "Constructor"
+  },
+  {
+    "inputs": [
+      { "name": "_lockId", "type": "bytes32" },
+      { "name": "_msgSender", "type": "address" },
+      { "name": "_proposedImpl", "type": "address" }
+    ],
+    "name": "ImplChangeRequested",
+    "type": "Event"
+  },
+  {
+    "inputs": [
+      { "name": "_lockId", "type": "bytes32" },
+      { "name": "_newImpl", "type": "address" }
+    ],
+    "name": "ImplChangeConfirmed",
+    "type": "Event"
+  },
+  {
+    "inputs": [
+      { "name": "_lockId", "type": "bytes32" },
+      { "name": "_msgSender", "type": "address" },
+      { "name": "_proposedCustodian", "type": "address" }
+    ],
+    "name": "CustodianChangeRequested",
+    "type": "Event"
+  },
+  {
+    "inputs": [
+      { "name": "_lockId", "type": "bytes32" },
+      { "name": "_newCustodian", "type": "address" }
+    ],
+    "name": "CustodianChangeConfirmed",
+    "type": "Event"
+  },
+  {
+    "inputs": [
+      { "indexed": true, "name": "from", "type": "address" },
+      { "indexed": true, "name": "to", "type": "address" },
+      { "name": "tokens", "type": "uint256" }
+    ],
+    "name": "Transfer",
+    "type": "Event"
+  },
+  {
+    "inputs": [
+      { "indexed": true, "name": "tokenOwner", "type": "address" },
+      { "indexed": true, "name": "spender", "type": "address" },
+      { "name": "tokens", "type": "uint256" }
+    ],
+    "name": "Approval",
+    "type": "Event"
+  },
+  {
+    "outputs": [{ "type": "uint256" }],
+    "constant": true,
+    "name": "totalSupply",
+    "stateMutability": "View",
+    "type": "Function"
+  },
+  {
+    "outputs": [{ "name": "balance", "type": "uint256" }],
+    "constant": true,
+    "inputs": [{ "name": "tokenOwner", "type": "address" }],
+    "name": "balanceOf",
+    "stateMutability": "View",
+    "type": "Function"
+  },
+  {
+    "inputs": [
+      { "name": "_from", "type": "address" },
+      { "name": "_to", "type": "address" },
+      { "name": "_value", "type": "uint256" }
+    ],
+    "name": "emitTransfer",
+    "stateMutability": "Nonpayable",
+    "type": "Function"
+  },
+  {
+    "outputs": [{ "name": "success", "type": "bool" }],
+    "inputs": [
+      { "name": "to", "type": "address" },
+      { "name": "tokens", "type": "uint256" }
+    ],
+    "name": "transfer",
+    "stateMutability": "Nonpayable",
+    "type": "Function"
+  },
+  {
+    "outputs": [{ "name": "success", "type": "bool" }],
+    "inputs": [
+      { "name": "from", "type": "address" },
+      { "name": "to", "type": "address" },
+      { "name": "tokens", "type": "uint256" }
+    ],
+    "name": "transferFrom",
+    "stateMutability": "Nonpayable",
+    "type": "Function"
+  },
+  {
+    "inputs": [
+      { "name": "_owner", "type": "address" },
+      { "name": "_spender", "type": "address" },
+      { "name": "_value", "type": "uint256" }
+    ],
+    "name": "emitApproval",
+    "stateMutability": "Nonpayable",
+    "type": "Function"
+  },
+  {
+    "outputs": [{ "name": "success", "type": "bool" }],
+    "inputs": [
+      { "name": "spender", "type": "address" },
+      { "name": "tokens", "type": "uint256" }
+    ],
+    "name": "approve",
+    "stateMutability": "Nonpayable",
+    "type": "Function"
+  },
+  {
+    "outputs": [{ "name": "success", "type": "bool" }],
+    "inputs": [
+      { "name": "_spender", "type": "address" },
+      { "name": "_addedValue", "type": "uint256" }
+    ],
+    "name": "increaseApproval",
+    "stateMutability": "Nonpayable",
+    "type": "Function"
+  },
+  {
+    "outputs": [{ "name": "success", "type": "bool" }],
+    "inputs": [
+      { "name": "_spender", "type": "address" },
+      { "name": "_subtractedValue", "type": "uint256" }
+    ],
+    "name": "decreaseApproval",
+    "stateMutability": "Nonpayable",
+    "type": "Function"
+  },
+  {
+    "outputs": [{ "name": "remaining", "type": "uint256" }],
+    "constant": true,
+    "inputs": [
+      { "name": "tokenOwner", "type": "address" },
+      { "name": "spender", "type": "address" }
+    ],
+    "name": "allowance",
+    "stateMutability": "View",
+    "type": "Function"
+  }
+]

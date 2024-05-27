@@ -1,0 +1,54 @@
+syntax = "proto3";
+
+package achivx.jobs;
+
+service Jobs {
+  rpc ListJobs(ListJobsRequest) returns (stream JobListEntry);
+
+  rpc RunJob(JobRunRequest) returns (JobRunResponse);
+}
+
+message ListJobsRequest {}
+
+enum JobState {
+  // Job did not run yet
+  UNKNOWN = 0;
+
+  // Job is running right now
+  RUNNING = 1;
+  
+  // Job failed with error on last run
+  ERROR = 2;
+
+  // Job did run successfully last time
+  DONE = 3;
+}
+
+message JobListEntry {
+  // Name of the job
+  string name = 1;
+
+  // Description of the job
+  string description = 2;
+
+  // Current state of the job
+  JobState state = 3;
+
+  // Date when the state was changed last time.
+  //
+  // Encoded as ISO-8601 date string.
+  string stateTime = 4;
+
+  // Additional information on job run results.
+  //
+  // Includes last error message.
+  // Encoded as JSON string.
+  string info = 5;
+}
+
+message JobRunRequest {
+  // Name of the job to run
+  string name = 1;
+}
+
+message JobRunResponse {}

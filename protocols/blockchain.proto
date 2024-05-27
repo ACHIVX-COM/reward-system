@@ -1,0 +1,59 @@
+syntax = "proto3";
+
+package achivx.blockchain;
+
+service Networks {
+  /**
+   * Returns list of configured blockchain networks.
+   */
+  rpc GetNetworks(NetworksListRequest) returns (stream NetworkDetails);
+
+  /**
+   * Checks if blockchain address is valid.
+   */
+  rpc ValidateWalletAddress(AddressValidationRequest) returns (AddressValidationResponse);
+}
+
+message NetworksListRequest {}
+
+message NetworkDetails {
+  string name = 1;
+  string typeName = 2;
+}
+
+message AddressValidationRequest {
+  string network = 1;
+  string address = 2;
+}
+
+message AddressValidationResponse {
+  bool isValid = 1;
+}
+
+service Currencies {
+  /**
+   * Returns list of configured blockchain currencies.
+   */
+  rpc GetCurrencies(CurrenciesListRequest) returns (stream CurrencyDetails);
+
+  /**
+   * Returns balance of a master wallet for given currency.
+   */
+  rpc GetMasterWalletBalance(MasterWalletBalanceRequest) returns (MasterWalletBalanceResponse);
+}
+
+message CurrenciesListRequest {}
+
+message CurrencyDetails {
+  string name = 1;
+  string typeName = 2;
+  string network = 3;
+}
+
+message MasterWalletBalanceRequest {
+  string currency = 1;
+}
+
+message MasterWalletBalanceResponse {
+  string balance = 1;
+}

@@ -1,0 +1,10 @@
+{
+  "ACHIVX_Tron": {
+    "type": "TRC20",
+    "network": "Tron-Main",
+    "decimals": 6,
+    "feeLimit": 1000000000,
+    "address": "TSMePsQvdDw1eyVHDbXfu9gqrGh4hfe1JM",
+    "extImplAddress": "TQsMiQ9ACbZqnFJtQ89NRU1pBEaA3G5hCw"
+  }
+}
