@@ -40,6 +40,19 @@ services:
       - TRON_PRIVATE_KEY=${TRON_PRIVATE_KEY}
     ports:
       - 50051:50051
+  reward-system-prebuilt:
+    profiles: ["prebuilt"]
+    image: achivx/reward-system:master
+    depends_on:
+      configuremongoreplset:
+        condition: service_completed_successfully
+    environment:
+      - MONGODB_URI=mongodb://mongodb/achivx-reward-system
+      - AUTH_TOKEN=${AUTH_TOKEN}
+      - TRON_PRIVATE_KEY=${TRON_PRIVATE_KEY}
+    ports:
+      - 50051:50051
+
 volumes:
   mongodbdata:
     driver: local
