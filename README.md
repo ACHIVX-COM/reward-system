@@ -1,5 +1,7 @@
 # ACHIVX Reward System
 
+[![Docker build](https://github.com/ACHIVX-COM/reward-system/actions/workflows/docker-master.yml/badge.svg)](https://github.com/ACHIVX-COM/reward-system/actions/workflows/docker-master.yml)
+
 This project provides a service that:
 
 - maitains balance of internal tokens (stored in database) and transaction history for each account
