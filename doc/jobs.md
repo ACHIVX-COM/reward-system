@@ -14,7 +14,7 @@ There are two ways to run them - using scripts of by calling a RPC.
 ### Using scripts
 
 There are scripts that enable managing jobs using shell commands.
-This approach may be preferrable:
+This approach may be preferable:
 - if you run the service from sources on dedicated server/vm.
   In this scenario it's possible to run jobs using cron or any other scheduler.
 - if the service runs as a docker container in Kubernetes.

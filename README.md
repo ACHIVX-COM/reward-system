@@ -4,7 +4,7 @@
 
 This project provides a service that:
 
-- maitains balance of internal tokens (stored in database) and transaction history for each account
+- maintains balance of internal tokens (stored in database) and transaction history for each account
 - enables withdrawal of internal tokens to real blockchain wallets
 
 The functionality is exposed as set of gRPC procedures.
@@ -61,7 +61,7 @@ It's purpose is to provide a quick start in development environment.
 
 ### Running from source
 
-After clonning the source, installing Node.js, setting up MongoDB and configuring environment variables in `.env.local`, the following commands will be enough to start the service:
+After cloning the source, installing Node.js, setting up MongoDB and configuring environment variables in `.env.local`, the following commands will be enough to start the service:
 
 ```sh
 # Use correct node.js version

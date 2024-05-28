@@ -17,7 +17,7 @@ class InsufficientFundsError extends Error {}
 module.exports.InsufficientFundsError = InsufficientFundsError;
 
 /**
- * @typedef {Object} TransactionCreationPrameters
+ * @typedef {Object} TransactionCreationParameters
  * @property {mongoose.Types.ObjectId} account
  * @property {string} amount
  * @property {Object<string, string>} meta
@@ -26,7 +26,7 @@ module.exports.InsufficientFundsError = InsufficientFundsError;
 /**
  * Creates transactions in database and modifies balances of related accounts.
  *
- * @param {TransactionCreationPrameters[]} parameters
+ * @param {TransactionCreationParameters[]} parameters
  * @param {mongoose.ClientSession} session mongodb session
  * @returns {Promise<InternalTransactionModel>}
  */
@@ -71,7 +71,7 @@ const createTransactions = (module.exports.createTransactions =
 /**
  * Helper for {@link createTransactions} that manages mongodb session.
  *
- * @param {TransactionCreationPrameters[]} parameters
+ * @param {TransactionCreationParameters[]} parameters
  * @returns {Promise<InternalTransactionModel>}
  */
 module.exports.createTransactionsSafe = async function createTransactionsSafe(

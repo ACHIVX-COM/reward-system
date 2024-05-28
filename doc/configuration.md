@@ -93,5 +93,5 @@ It must be a name of network previously configured in networks configuration fil
 ACHIVX TRC20 contract has some additional methods beyond standard TRC20 interface.
 One of such methods enables batch transfer of tokens - thus making withdrawal transaction more efficient when there are many of them.
 The additional methods are exposed through a separate contract, address of such contract can be specified with `extImplAddress`.
-If contract does not implement such methods, `extImplAddress` should be omited.
+If contract does not implement such methods, `extImplAddress` should be omitted.
 The service will use standard TRC20 transactions if `extImplAddress` is not set.

@@ -37,9 +37,9 @@ module.exports = class Currency {
    *
    * This method should try to send these transactions to the blockchain and change their statuses to one of the following:
    * - MINED - if transaction was sent and executed successfully
-   * - SENDING - if transaction was sent, no error has happend but it's not yet possible to tell if it was processed successfully
+   * - SENDING - if transaction was sent, no error has happened but it's not yet possible to tell if it was processed successfully
    * - SEND_FAILED - if transaction could not be sent because of an error
-   * - SEND_UNKNOWN_ERROR - if error has happend while sending the transaction and it is not known if the thransaction was actually sent
+   * - SEND_UNKNOWN_ERROR - if error has happened while sending the transaction and it is not known if the transaction was actually sent
    *
    * @param {import('mongoose').Document[]} _transactions
    * @abstract

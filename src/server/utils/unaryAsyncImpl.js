@@ -10,7 +10,7 @@
  * The handler will call the function on every GRPC call.
  * Value returned by the function will be treated as call's response.
  * Thrown errors will make the call finish with an error.
- * It's preferrable to throw errors of types from [errors module](./errors.js).
+ * It's preferable to throw errors of types from [errors module](./errors.js).
  *
  * @param {UnaryAsyncHandler} handler
  * @returns

@@ -47,7 +47,7 @@ service Transactions {
    * Update status of a withdrawal transaction in SENDING or SEND_UNKNOWN_ERROR statuses.
    *
    * This procedure can be used to:
-   * - restore transaction after an unknown error which cannot be handled automatically happend while sending it to
+   * - restore transaction after an unknown error which cannot be handled automatically happened while sending it to
    *   blockchain (status SEND_UNKNOWN_ERROR)
    * - notify system about change of blockchain transaction status change before it is detected automatically or when
    *   it could not be detected automatically (status SENDING)
@@ -112,7 +112,7 @@ message TransactionWithdrawalDetails {
   // Address to withdraw tokens to
   //
   // This is user's withdrawal wallet for blockchain network corresponding to the target currency.
-  // It is stored at the moment of withdrawal transaction createion and cannot be changed later.
+  // It is stored at the moment of withdrawal transaction creation and cannot be changed later.
   string withdrawalAddress = 3;
 
   // How much of target currency the user receives
