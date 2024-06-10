@@ -34,3 +34,10 @@ module.exports.FailedPrecondition = class FailedPrecondition extends Error {
     this.code = grpc.status.FAILED_PRECONDITION;
   }
 };
+
+module.exports.AlreadyExists = class AlreadyExists extends Error {
+  constructor(message = "Already exists") {
+    super(message);
+    this.code = grpc.status.ALREADY_EXISTS;
+  }
+};

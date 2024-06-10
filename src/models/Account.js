@@ -56,6 +56,22 @@ const accountSchema = mongoose.Schema({
     type: [withdrawalAddressSchema],
     default: [],
   },
+
+  experience: {
+    type: Number,
+    default: 0,
+    min: 0,
+  },
+  level: {
+    type: Number,
+    default: 0,
+    min: 0,
+  },
+
+  lastActiveAt: {
+    type: Date,
+    required: false,
+  },
 });
 
 /**

@@ -1,6 +1,6 @@
 const unaryAsyncImpl = require("../utils/unaryAsyncImpl");
 const { AccountModel } = require("../../models/Account");
-const { NotFound, InvalidArgument } = require("../utils/errors");
+const { NotFound, InvalidArgument, AlreadyExists } = require("../utils/errors");
 const { authenticateCall } = require("../authenticate");
 const { default: mongoose } = require("mongoose");
 
@@ -11,6 +11,9 @@ function accountToDetailedResponse(account) {
     withdrawalAddresses: account.withdrawalAddresses.map(
       ({ network, address }) => ({ network, address }),
     ),
+    experience: account.experience,
+    level: account.level,
+    lastActiveAt: account.lastActiveAt?.toISOString(),
   };
 }
 
@@ -102,4 +105,45 @@ module.exports.AddWithdrawalAddress = unaryAsyncImpl(async (call) => {
   return accountToDetailedResponse(
     await AccountModel.findById(account._id).lean(),
   );
+});
+
+module.exports.TrackAccountActivity = unaryAsyncImpl(async (call) => {
+  await authenticateCall(call);
+
+  const {
+    request: { account, timestamp },
+  } = call;
+
+  if (!account) {
+    throw new InvalidArgument("Missing account ID");
+  }
+
+  let activityTimestamp;
+
+  if (timestamp) {
+    try {
+      activityTimestamp = new Date(timestamp);
+    } catch (e) {
+      console.error(e);
+      throw new InvalidArgument(`Invalid timestamp: ${e}`);
+    }
+  } else {
+    activityTimestamp = new Date();
+  }
+
+  const modified = await AccountModel.findOneAndUpdate(
+    { externalId: account, lastActiveAt: { $lt: activityTimestamp } },
+    { $set: { lastActiveAt: activityTimestamp } },
+    { new: true },
+  ).lean();
+
+  if (!modified) {
+    if (!(await AccountModel.exists({ externalId: account }))) {
+      throw new NotFound("Account not found");
+    } else {
+      throw new AlreadyExists("A more recent activity is already tracked");
+    }
+  }
+
+  return accountToDetailedResponse(modified);
 });

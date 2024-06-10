@@ -6,14 +6,15 @@ This document describes all aspects of ACHIVX Reward System configuration.
 
 Some settings should be provided as environment variables:
 
-| Variable                 | Default                                | Description                                                                                            |
-| ------------------------ | -------------------------------------- | ------------------------------------------------------------------------------------------------------ |
-| `BIND_ADDRESS`           | `0.0.0.0:50051`                        | Address to run GRPC server on                                                                          |
-| `MONGODB_URL`            | None                                   | URL of mongodb database to use, including credentials. E.g. `mongodb://user:password@localhost/achivx` |
-| `AUTH_TOKEN`             | None                                   | A token that client must specify in `authentication` metadata in order to get access to the service    |
-| `NETWORKS_CONFIG_PATH`   | `<projectRoot>/config/networks.json`   | Path to JSON file describing blockchain networks the service should use                                |
-| `CURRENCIES_CONFIG_PATH` | `<projectRoot>/config/currencies.json` | Path to JSON file describing blockchain currencies the service should use                              |
-| `TRON_PRIVATE_KEY`       | None                                   | Private key for Tron network(s) master wallet                                                          |
+| Variable                   | Default                                  | Description                                                                                            |
+| -------------------------- | ---------------------------------------- | ------------------------------------------------------------------------------------------------------ |
+| `BIND_ADDRESS`             | `0.0.0.0:50051`                          | Address to run GRPC server on                                                                          |
+| `MONGODB_URL`              | None                                     | URL of mongodb database to use, including credentials. E.g. `mongodb://user:password@localhost/achivx` |
+| `AUTH_TOKEN`               | None                                     | A token that client must specify in `authentication` metadata in order to get access to the service    |
+| `NETWORKS_CONFIG_PATH`     | `<projectRoot>/config/networks.json`     | Path to JSON file describing blockchain networks the service should use                                |
+| `CURRENCIES_CONFIG_PATH`   | `<projectRoot>/config/currencies.json`   | Path to JSON file describing blockchain currencies the service should use                              |
+| `TRON_PRIVATE_KEY`         | None                                     | Private key for Tron network(s) master wallet                                                          |
+| `GAMIFICATION_CONFIG_PATH` | `<projectRoot>/config/gamification.json` | Path to JSON file with gamification configuration                                                      |
 
 Environment variables that have no default values are usually required for the service to start.
 
@@ -95,3 +96,19 @@ One of such methods enables batch transfer of tokens - thus making withdrawal tr
 The additional methods are exposed through a separate contract, address of such contract can be specified with `extImplAddress`.
 If contract does not implement such methods, `extImplAddress` should be omitted.
 The service will use standard TRC20 transactions if `extImplAddress` is not set.
+
+## Gamification configuration
+
+TBD
+
+### Levels
+
+TBD
+
+### Achievements
+
+TBD
+
+### XP Reduction
+
+TBD

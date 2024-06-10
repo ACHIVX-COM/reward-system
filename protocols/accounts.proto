@@ -16,6 +16,12 @@ service Accounts {
     // This procedure is idempotent - repeated calls with the same account id are allowed.
     rpc UpsertAccount(AccountUpsertRequest) returns (AccountDetailsResponse) {}
 
+    // Notify the system that an account did perform some activity.
+    //
+    // This procedure may update lastActiveAt field of the account.
+    // It enables detection of active/inactive accounts, which is used by some parts of gamification functionality.
+    rpc TrackAccountActivity(AccountActivityTrackRequest) returns (AccountDetailsResponse);
+
     // Add a withdrawal wallet address to an account.
     rpc AddWithdrawalAddress(WithdrawalAddressAddRequest) returns (AccountDetailsResponse);
 }
@@ -51,6 +57,13 @@ message AccountDetailsResponse {
 
     // Blockchain addresses this account uses to withdraw tokens.
     repeated WithdrawalAddress withdrawalAddresses = 3;
+
+    int level = 4;
+    int experience = 5;
+
+    // Timestamp of most recent account activity, encoded as ISO-8601 string.
+    // Can be updated by TrackAccountActivity.
+    string lastActiveAt = 6;
 }
 
 message AccountUpsertRequest {
@@ -61,4 +74,13 @@ message AccountUpsertRequest {
     // Note that even if the account identifiers are numbers, they are still compared as strings.
     // So, for example "1", "01", "1.0" are three different account identifiers.
     string id = 1;
+}
+
+message AccountActivityTrackRequest {
+    string account = 1;
+
+    // Timestamp of account activity, encoded as ISO-8601 string.
+    // If omitted, the current time will be used.
+    // If current lastActiveAt of account is after this timestamp, it will not be updated.
+    optional timestamp = 2;
 }

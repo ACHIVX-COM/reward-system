@@ -1,0 +1,41 @@
+{
+  "levels": [
+    {
+      "xp": 400,
+      "reward": 0
+    },
+    {
+      "xp": 800
+    },
+    {
+      "xp": 1200
+    },
+    {
+      "xp": 2000
+    },
+    {
+      "xp": 4000
+    }
+  ],
+  "achievements": {
+    "WritePost": {
+      "xp": 1,
+      "reward": 0.1,
+      "repeatable": true
+    },
+    "WriteFirstPost": {
+      "xp": 10,
+      "reward": 0.5
+    },
+    "GetPostBanned": {
+      "xp": -2,
+      "reward": -1,
+      "repeatable": true
+    }
+  },
+  "experienceReduction": {
+    "enabled": true,
+    "amount": 200,
+    "delay": "30 days"
+  }
+}

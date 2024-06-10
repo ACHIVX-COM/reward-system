@@ -3,6 +3,7 @@ const mongoose = require("mongoose");
 require("../models/Account");
 require("../models/InternalTransaction");
 require("../models/JobStatusModel");
+require("../models/Achievement");
 
 module.exports.mongoose = mongoose;
 
