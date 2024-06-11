@@ -11,6 +11,7 @@ const {
 const protoLoader = require("@grpc/proto-loader");
 
 const accountRPCs = require("./rpcs/account");
+const achievementsRPCs = require("./rpcs/achievements");
 const blockchainCurrenciesRPCs = require("./rpcs/blockchainCurrencies");
 const blockchainNetworksRPCs = require("./rpcs/blockchainNetworks");
 const transactionsRPCs = require("./rpcs/transactions");
@@ -35,6 +36,10 @@ const grpcPackage = grpc.loadPackageDefinition(packageDefinition);
  */
 function addServices(server) {
   server.addService(grpcPackage.achivx.accounts.Accounts.service, accountRPCs);
+  server.addService(
+    grpcPackage.achivx.achievements.Achievements.service,
+    achievementsRPCs,
+  );
   server.addService(
     grpcPackage.achivx.transactions.Transactions.service,
     transactionsRPCs,

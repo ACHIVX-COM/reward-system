@@ -58,8 +58,8 @@ message AccountDetailsResponse {
     // Blockchain addresses this account uses to withdraw tokens.
     repeated WithdrawalAddress withdrawalAddresses = 3;
 
-    int level = 4;
-    int experience = 5;
+    int32 level = 4;
+    int32 experience = 5;
 
     // Timestamp of most recent account activity, encoded as ISO-8601 string.
     // Can be updated by TrackAccountActivity.
@@ -82,5 +82,5 @@ message AccountActivityTrackRequest {
     // Timestamp of account activity, encoded as ISO-8601 string.
     // If omitted, the current time will be used.
     // If current lastActiveAt of account is after this timestamp, it will not be updated.
-    optional timestamp = 2;
+    optional string timestamp = 2;
 }

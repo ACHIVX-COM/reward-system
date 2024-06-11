@@ -62,7 +62,10 @@ const accountSchema = mongoose.Schema({
     default: 0,
     min: 0,
   },
-  level: {
+
+  // Highest level this account did ever reach (and receive reward, if any).
+  // This is stored to avoid sending reward for same level twice if the user gets downgraded and then reaches the same level again.
+  rewardedLevel: {
     type: Number,
     default: 0,
     min: 0,

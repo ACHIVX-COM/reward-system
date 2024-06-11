@@ -33,12 +33,12 @@ message AccountAchievementsListRequest {
   string account = 1;
 }
 
-message AccountAchievementsListRequest {}
+message AchievementsConfigurationRequest {}
 
 message AchievementConfiguration {
   string name = 1;
 
-  int xp = 2;
+  int32 xp = 2;
   float reward = 3;
 
   bool repeatable = 4;

@@ -3,6 +3,7 @@ const { AccountModel } = require("../../models/Account");
 const { NotFound, InvalidArgument, AlreadyExists } = require("../utils/errors");
 const { authenticateCall } = require("../authenticate");
 const { default: mongoose } = require("mongoose");
+const { getLevelByXp } = require("../../services/gamificationService");
 
 function accountToDetailedResponse(account) {
   return {
@@ -12,7 +13,7 @@ function accountToDetailedResponse(account) {
       ({ network, address }) => ({ network, address }),
     ),
     experience: account.experience,
-    level: account.level,
+    level: getLevelByXp(account.experience),
     lastActiveAt: account.lastActiveAt?.toISOString(),
   };
 }
