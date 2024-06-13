@@ -1,26 +1,26 @@
 const unaryAsyncImpl = require("../utils/unaryAsyncImpl");
 const streamAsyncImpl = require("../utils/streamAsyncImpl");
 const { AccountModel } = require("../../models/Account");
-const { AchievementModel } = require("../../models/Achievement");
+const { ActionModel } = require("../../models/Action");
 const { NotFound, InvalidArgument, AlreadyExists } = require("../utils/errors");
 const { authenticateCall } = require("../authenticate");
 const {
-  assignAchievement,
-  InvalidAchievementError,
-  DuplicateAchievementError,
-  getAchievementsConfigurations,
+  createAction,
+  InvalidActionError,
+  DuplicateActionError,
+  getActionsConfigurations,
 } = require("../../services/gamificationService");
 const { useMongodbSession } = require("../../utils/useMongoSession");
 
-function achievementToResponse(achievement) {
+function actionToResponse(action) {
   return {
-    achievement: achievement.achievement,
-    key: achievement.key ?? undefined,
-    assignedAt: achievement.createdAt.toISOString(),
+    action: action.action,
+    key: action.key ?? undefined,
+    assignedAt: action.createdAt.toISOString(),
   };
 }
 
-module.exports.GetAccountAchievements = streamAsyncImpl(async function* (call) {
+module.exports.GetAccountActions = streamAsyncImpl(async function* (call) {
   await authenticateCall(call);
 
   const { account } = call.request;
@@ -35,24 +35,24 @@ module.exports.GetAccountAchievements = streamAsyncImpl(async function* (call) {
     throw new NotFound("Account not found");
   }
 
-  for await (const achievement of AchievementModel.find({
+  for await (const action of ActionModel.find({
     account: accountDoc._id,
   })) {
-    yield achievementToResponse(achievement);
+    yield actionToResponse(action);
   }
 });
 
-module.exports.AssignAchievement = unaryAsyncImpl(async (call) => {
+module.exports.CreateAction = unaryAsyncImpl(async (call) => {
   await authenticateCall(call);
 
-  const { account, achievement, key } = call.request;
+  const { account, action, key } = call.request;
 
   if (!account) {
     throw new InvalidArgument("Missing account ID");
   }
 
-  if (!achievement) {
-    throw new InvalidArgument("Missing achievement name");
+  if (!action) {
+    throw new InvalidArgument("Missing action name");
   }
 
   const accountDoc = await AccountModel.findOne({ externalId: account });
@@ -63,28 +63,28 @@ module.exports.AssignAchievement = unaryAsyncImpl(async (call) => {
 
   try {
     const assigned = await useMongodbSession((session) =>
-      assignAchievement(accountDoc._id, achievement, key, session),
+      createAction(accountDoc._id, action, key, session),
     );
 
-    return achievementToResponse(assigned);
+    return actionToResponse(assigned);
   } catch (e) {
-    if (e instanceof InvalidAchievementError) {
+    if (e instanceof InvalidActionError) {
       throw new InvalidArgument(e.message);
     }
 
-    if (e instanceof DuplicateAchievementError) {
-      throw new AlreadyExists("Achievement already exists");
+    if (e instanceof DuplicateActionError) {
+      throw new AlreadyExists("Action already exists");
     }
 
     throw e;
   }
 });
 
-module.exports.GetAchievementsConfiguration = streamAsyncImpl(
+module.exports.GetActionsConfiguration = streamAsyncImpl(
   async function* (call) {
     await authenticateCall(call);
 
-    const configurations = getAchievementsConfigurations();
+    const configurations = getActionsConfigurations();
 
     for (const [
       name,

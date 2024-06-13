@@ -1,17 +1,17 @@
 const mongoose = require("mongoose");
 
-const achievementSchema = mongoose.Schema(
+const actionSchema = mongoose.Schema(
   {
     account: {
       type: mongoose.Types.ObjectId,
       required: true,
     },
-    achievement: {
+    action: {
       type: String,
       required: true,
     },
-    // Identifier of achievement instance for repeatable achievements.
-    // E.g. post identifier for "write post" achievement.
+    // Identifier of action instance for repeatable actions.
+    // E.g. post identifier for "write post" action.
     key: {
       type: String,
     },
@@ -19,10 +19,10 @@ const achievementSchema = mongoose.Schema(
   { timestamps: true },
 );
 
-achievementSchema.index(
+actionSchema.index(
   {
     account: 1,
-    achievement: 1,
+    action: 1,
     key: 1,
   },
   {
@@ -33,7 +33,4 @@ achievementSchema.index(
 /**
  * @type {mongoose.Model}
  */
-module.exports.AchievementModel = mongoose.model(
-  "Achievement",
-  achievementSchema,
-);
+module.exports.ActionModel = mongoose.model("Action", actionSchema);

@@ -1,6 +1,6 @@
 const assert = require("node:assert");
 const { AccountModel } = require("../models/Account");
-const { AchievementModel } = require("../models/Achievement");
+const { ActionModel } = require("../models/Action");
 const { createTransactions } = require("./internalTransactionsService");
 const isMongodbDuplicationError = require("../utils/isMongodbDuplicationError");
 const { default: Decimal } = require("decimal.js-light");
@@ -172,7 +172,7 @@ async function subExperience(accountId, experience, session) {
 }
 
 /**
- * Pay reward for an achievement.
+ * Pay reward for an action.
  *
  * If reward is negative, it may be cancelled or it's value may be changed to avoid accounts balance going negative.
  *
@@ -181,7 +181,7 @@ async function subExperience(accountId, experience, session) {
  * @param {{}} meta
  * @param {import('mongoose').mongo.ClientSession} session
  */
-async function payAchievementReward(accountId, reward, meta, session) {
+async function payActionReward(accountId, reward, meta, session) {
   let amount;
 
   if (reward < 0) {
@@ -215,64 +215,62 @@ async function payAchievementReward(accountId, reward, meta, session) {
   );
 }
 
-const InvalidAchievementError =
-  (module.exports.InvalidAchievementError = class InvalidAchievementError extends (
+const InvalidActionError =
+  (module.exports.InvalidActionError = class InvalidActionError extends (
     Error
   ) {});
 
-const DuplicateAchievementError =
-  (module.exports.DuplicateAchievementError = class DuplicateAchievementError extends (
+const DuplicateActionError =
+  (module.exports.DuplicateActionError = class DuplicateActionError extends (
     Error
   ) {});
 
 /**
- * Assign an achievement to account. Modify account experience, handle level change, pay rewards if necessary.
+ * Record an action performed by a user. Modify account experience, handle level change, pay rewards if necessary.
  *
  * @param {import('mongoose').Types.ObjectId} accountId
- * @param {string} achievement
+ * @param {string} action
  * @param {string?} key
  * @param {import('mongoose').mongo.ClientSession} session
- * @returns {import('mongoose').Document?} created achievement document
- * @throws {InvalidAchievementError} if the achievement name is unknown
- * @throws {InvalidAchievementError} if the key is missing for repeatable achievement
- * @throws {InvalidAchievementError} if the key is present for non-repeatable achievement
- * @throws {DuplicateAchievementError} if the achievement already exists
+ * @returns {import('mongoose').Document?} created action document
+ * @throws {InvalidActionError} if the action name is unknown
+ * @throws {InvalidActionError} if the key is missing for repeatable action
+ * @throws {InvalidActionError} if the key is present for non-repeatable action
+ * @throws {DuplicateActionError} if the action already exists
  */
-module.exports.assignAchievement = async function assignAchievement(
+module.exports.createAction = async function createAction(
   accountId,
-  achievement,
+  action,
   key,
   session,
 ) {
-  const achievementConfig = gamificationConfig.achievements[achievement];
+  const actionConfig = gamificationConfig.actions[action];
 
-  if (!achievementConfig) {
-    throw new InvalidAchievementError(
-      `Unknown achievement name: ${achievement}`,
-    );
+  if (!actionConfig) {
+    throw new InvalidActionError(`Unknown action name: ${action}`);
   }
 
-  const { repeatable, xp = 0, reward = 0 } = achievementConfig;
+  const { repeatable, xp = 0, reward = 0 } = actionConfig;
 
   if (repeatable && !key) {
-    throw new InvalidAchievementError(
-      `Achievement ${achievement} is repeatable but key is not provided`,
+    throw new InvalidActionError(
+      `Action ${action} is repeatable but key is not provided`,
     );
   }
 
   if (!repeatable && !!key) {
-    throw new InvalidAchievementError(
-      `Achievement ${achievement} is not repeatable but key is provided`,
+    throw new InvalidActionError(
+      `Action ${action} is not repeatable but key is provided`,
     );
   }
 
-  let achievementDoc = null;
+  let actionDoc = null;
 
   try {
-    [achievementDoc] = await AchievementModel.create(
+    [actionDoc] = await ActionModel.create(
       [
         {
-          achievement,
+          action,
           account: accountId,
           key: key ?? null,
         },
@@ -281,30 +279,30 @@ module.exports.assignAchievement = async function assignAchievement(
     );
   } catch (e) {
     if (isMongodbDuplicationError(e)) {
-      throw new DuplicateAchievementError();
+      throw new DuplicateActionError();
     }
 
     throw e;
   }
 
   if (xp > 0) {
-    await addExperience(accountId, achievementConfig.xp, session);
+    await addExperience(accountId, actionConfig.xp, session);
   } else if (xp < 0) {
-    await subExperience(accountId, -achievementConfig.xp, session);
+    await subExperience(accountId, -actionConfig.xp, session);
   }
 
-  await payAchievementReward(
+  await payActionReward(
     accountId,
     reward,
     {
-      achievement,
-      achievementId: achievementDoc._id.toString(),
-      achievementKey: key || undefined,
+      action,
+      actionId: actionDoc._id.toString(),
+      actionKey: key || undefined,
     },
     session,
   );
 
-  return achievementDoc;
+  return actionDoc;
 };
 
 /**
@@ -317,7 +315,6 @@ module.exports.getLevelByXp = function getLevelByXp(xp) {
   return levelsConfig.getLevelByXp(xp);
 };
 
-module.exports.getAchievementsConfigurations =
-  function getAchievementsConfigurations() {
-    return gamificationConfig.achievements ?? {};
-  };
+module.exports.getActionsConfigurations = function getActionsConfigurations() {
+  return gamificationConfig.actions ?? {};
+};

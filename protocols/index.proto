@@ -1,7 +1,7 @@
 syntax = "proto3";
 
 import "protocols/accounts.proto";
-import "protocols/achievements.proto";
+import "protocols/actions.proto";
 import "protocols/blockchain.proto";
 import "protocols/jobs.proto";
 import "protocols/transactions.proto";

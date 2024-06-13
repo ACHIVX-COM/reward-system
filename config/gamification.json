@@ -17,7 +17,7 @@
       "xp": 4000
     }
   ],
-  "achievements": {
+  "actions": {
     "WritePost": {
       "xp": 1,
       "reward": 0.1,
