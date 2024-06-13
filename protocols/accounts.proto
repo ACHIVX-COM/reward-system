@@ -18,7 +18,7 @@ service Accounts {
 
     // Notify the system that an account did perform some activity.
     //
-    // This procedure may update lastActiveAt field of the account.
+    // This procedure may update lastActiveAt field of the account, the same way as when an action is created.
     // It enables detection of active/inactive accounts, which is used by some parts of gamification functionality.
     rpc TrackAccountActivity(AccountActivityTrackRequest) returns (AccountDetailsResponse);
 
@@ -62,7 +62,7 @@ message AccountDetailsResponse {
     int32 experience = 5;
 
     // Timestamp of most recent account activity, encoded as ISO-8601 string.
-    // Can be updated by TrackAccountActivity.
+    // Can be updated by TrackAccountActivity or when creating an Action.
     string lastActiveAt = 6;
 }
 

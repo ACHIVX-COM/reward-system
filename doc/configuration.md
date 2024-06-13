@@ -107,7 +107,31 @@ TBD
 
 ### Actions
 
-TBD
+Actions are configured in `"actions"` section of gamification config file.
+The section is a JSON object where a key is an action name and the value is an object containing action settings:
+
+```JavaScript
+{
+  // ...,
+  "actions": {
+    // Name of the action is a key in "actions" section.
+    "MyAction": {
+      // Amount of experience the user receives for this action.
+      // Defaults to 0
+      "xp": 20,
+
+      // Reward in internal tokens the user receives.
+      // Defaults to 0
+      "reward": 1,
+
+      // Can the action be performed multiple times by single user?
+      // Defaults to false.
+      // If true, you should provide a unique (among the same actions of the same user) key for each action instance.
+      "repeatable": true
+    }
+  }
+}
+```
 
 ### XP Reduction
 

@@ -19,6 +19,9 @@ message CreateActionRequest {
   string action = 2;
 
   optional string key = 3;
+
+  optional int32 experienceOverride = 4;
+  optional float rewardOverride = 5;
 }
 
 message AccountAction {
@@ -26,7 +29,11 @@ message AccountAction {
 
   optional string key = 2;
 
-  string assignedAt = 3;
+  string createdAt = 3;
+
+  int32 experience = 4;
+
+  float reward = 5;
 }
 
 message AccountActionsListRequest {

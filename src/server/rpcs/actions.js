@@ -16,7 +16,9 @@ function actionToResponse(action) {
   return {
     action: action.action,
     key: action.key ?? undefined,
-    assignedAt: action.createdAt.toISOString(),
+    createdAt: action.createdAt.toISOString(),
+    experience: action.experience,
+    reward: action.reward,
   };
 }
 
@@ -37,7 +39,7 @@ module.exports.GetAccountActions = streamAsyncImpl(async function* (call) {
 
   for await (const action of ActionModel.find({
     account: accountDoc._id,
-  })) {
+  }).sort({ createdAt: -1 })) {
     yield actionToResponse(action);
   }
 });
@@ -45,7 +47,8 @@ module.exports.GetAccountActions = streamAsyncImpl(async function* (call) {
 module.exports.CreateAction = unaryAsyncImpl(async (call) => {
   await authenticateCall(call);
 
-  const { account, action, key } = call.request;
+  const { account, action, key, experienceOverride, rewardOverride } =
+    call.request;
 
   if (!account) {
     throw new InvalidArgument("Missing account ID");
@@ -63,7 +66,16 @@ module.exports.CreateAction = unaryAsyncImpl(async (call) => {
 
   try {
     const assigned = await useMongodbSession((session) =>
-      createAction(accountDoc._id, action, key, session),
+      createAction(
+        {
+          accountId: accountDoc._id,
+          action,
+          key,
+          experienceOverride,
+          rewardOverride,
+        },
+        session,
+      ),
     );
 
     return actionToResponse(assigned);

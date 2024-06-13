@@ -226,11 +226,18 @@ const DuplicateActionError =
   ) {});
 
 /**
+ * @typedef {Object} ActionParameters
+ * @property {string} action
+ * @property {import('mongoose').Types.ObjectId} accountId
+ * @property {string?} key
+ * @property {number?} experienceOverride
+ * @property {number?} rewardOverride
+ */
+
+/**
  * Record an action performed by a user. Modify account experience, handle level change, pay rewards if necessary.
  *
- * @param {import('mongoose').Types.ObjectId} accountId
- * @param {string} action
- * @param {string?} key
+ * @param {ActionParameters} actionParameters
  * @param {import('mongoose').mongo.ClientSession} session
  * @returns {import('mongoose').Document?} created action document
  * @throws {InvalidActionError} if the action name is unknown
@@ -239,18 +246,24 @@ const DuplicateActionError =
  * @throws {DuplicateActionError} if the action already exists
  */
 module.exports.createAction = async function createAction(
-  accountId,
-  action,
-  key,
+  { accountId, action, key, experienceOverride, rewardOverride },
   session,
 ) {
+  assert.ok(session);
+
   const actionConfig = gamificationConfig.actions[action];
 
   if (!actionConfig) {
     throw new InvalidActionError(`Unknown action name: ${action}`);
   }
 
-  const { repeatable, xp = 0, reward = 0 } = actionConfig;
+  const {
+    repeatable,
+    xp: defaultXp = 0,
+    reward: defaultReward = 0,
+  } = actionConfig;
+  const experience = experienceOverride ?? defaultXp;
+  const reward = rewardOverride ?? defaultReward;
 
   if (repeatable && !key) {
     throw new InvalidActionError(
@@ -264,6 +277,17 @@ module.exports.createAction = async function createAction(
     );
   }
 
+  const now = new Date();
+
+  await AccountModel.updateOne(
+    {
+      _id: accountId,
+      lastActiveAt: { $not: { $gte: now } },
+    },
+    { $set: { lastActiveAt: now } },
+    { session },
+  );
+
   let actionDoc = null;
 
   try {
@@ -273,6 +297,8 @@ module.exports.createAction = async function createAction(
           action,
           account: accountId,
           key: key ?? null,
+          experience,
+          reward,
         },
       ],
       { session },
@@ -285,10 +311,10 @@ module.exports.createAction = async function createAction(
     throw e;
   }
 
-  if (xp > 0) {
-    await addExperience(accountId, actionConfig.xp, session);
-  } else if (xp < 0) {
-    await subExperience(accountId, -actionConfig.xp, session);
+  if (experience > 0) {
+    await addExperience(accountId, experience, session);
+  } else if (experience < 0) {
+    await subExperience(accountId, -experience, session);
   }
 
   await payActionReward(

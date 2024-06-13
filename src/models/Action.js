@@ -15,6 +15,17 @@ const actionSchema = mongoose.Schema(
     key: {
       type: String,
     },
+
+    experience: {
+      type: Number,
+      required: true,
+      default: 0,
+    },
+    reward: {
+      type: Number,
+      required: true,
+      default: 0,
+    },
   },
   { timestamps: true },
 );
@@ -29,6 +40,8 @@ actionSchema.index(
     unique: true,
   },
 );
+
+actionSchema.index({ account: 1, createdAt: -1 });
 
 /**
  * @type {mongoose.Model}

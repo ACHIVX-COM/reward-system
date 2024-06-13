@@ -251,3 +251,7 @@ In the worst case an error happens while sending the transaction and the job can
 Transaction status changes to `SEND_UNKNOWN_ERROR` in such case.
 Transactions in this status will not be handled automatically and require manual actions.
 After checking the status of transaction manually you should call `achivx.transactions.Transactions/RestoreWithdrawalStatus` procedure to chage it status to either `SEND_FAILED`, `DENIED` or `MINED`.
+
+## Tracking user actions and activity
+
+TBD

@@ -2,19 +2,23 @@
   "levels": [
     {
       "xp": 400,
-      "reward": 0
+      "reward": 1
     },
     {
-      "xp": 800
+      "xp": 800,
+      "reward": 2
     },
     {
-      "xp": 1200
+      "xp": 1200,
+      "reward": 4
     },
     {
-      "xp": 2000
+      "xp": 2000,
+      "reward": 8
     },
     {
-      "xp": 4000
+      "xp": 4000,
+      "reward": 16
     }
   ],
   "actions": {
