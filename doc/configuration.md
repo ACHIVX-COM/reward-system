@@ -127,7 +127,12 @@ The section is a JSON object where a key is an action name and the value is an o
       // Can the action be performed multiple times by single user?
       // Defaults to false.
       // If true, you should provide a unique (among the same actions of the same user) key for each action instance.
-      "repeatable": true
+      "repeatable": true,
+
+      // True if this action should be treated as user activity.
+      // Defaults to true.
+      // It should be set to false for actions the user does not perform but should be rewarded from e.g. "get a reaction on post".
+      "trackActivity": true
     }
   }
 }
@@ -135,4 +140,26 @@ The section is a JSON object where a key is an action name and the value is an o
 
 ### XP Reduction
 
-TBD
+ACHIVX Reward System provides a [job](./jobs.md) to reduce experience of inactive users.
+The job name is `"reduce-xp"`.
+The job is configured by `"experienceReduction"` section of gamification configuration file:
+
+```JavaScript
+{
+  // ...
+  "experienceReduction": {
+    // Enables XP reduction.
+    // It is disabled by default.
+    "enabled": true,
+
+    // Amount of XP taken from user on every reduction.
+    "amount": 100,
+
+    // Duration of user inactivity before first reduction.
+    "delay": "30 days",
+
+    // Interval between following reductions, if user is still inactive.
+    "interval": "30 days",
+  }
+}
+```

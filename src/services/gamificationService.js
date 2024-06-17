@@ -258,7 +258,8 @@ module.exports.createAction = async function createAction(
   }
 
   const {
-    repeatable,
+    repeatable = false,
+    trackActivity = true,
     xp: defaultXp = 0,
     reward: defaultReward = 0,
   } = actionConfig;
@@ -276,17 +277,6 @@ module.exports.createAction = async function createAction(
       `Action ${action} is not repeatable but key is provided`,
     );
   }
-
-  const now = new Date();
-
-  await AccountModel.updateOne(
-    {
-      _id: accountId,
-      lastActiveAt: { $not: { $gte: now } },
-    },
-    { $set: { lastActiveAt: now } },
-    { session },
-  );
 
   let actionDoc = null;
 
@@ -309,6 +299,17 @@ module.exports.createAction = async function createAction(
     }
 
     throw e;
+  }
+
+  if (trackActivity) {
+    await AccountModel.updateOne(
+      {
+        _id: accountId,
+        lastActiveAt: { $not: { $gte: actionDoc.createdAt } },
+      },
+      { $set: { lastActiveAt: actionDoc.createdAt } },
+      { session },
+    );
   }
 
   if (experience > 0) {
@@ -344,3 +345,17 @@ module.exports.getLevelByXp = function getLevelByXp(xp) {
 module.exports.getActionsConfigurations = function getActionsConfigurations() {
   return gamificationConfig.actions ?? {};
 };
+
+module.exports.getXpReductionConfiguration =
+  function getXpReductionConfiguration() {
+    const {
+      experienceReduction: {
+        enabled = false,
+        amount = 200,
+        delay = "30 days",
+        interval = "30 days",
+      } = {},
+    } = gamificationConfig;
+
+    return { enabled, amount, delay, interval };
+  };

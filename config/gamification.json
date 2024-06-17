@@ -34,12 +34,14 @@
     "GetPostBanned": {
       "xp": -2,
       "reward": -1,
+      "trackActivity": false,
       "repeatable": true
     }
   },
   "experienceReduction": {
     "enabled": true,
     "amount": 200,
-    "delay": "30 days"
+    "delay": "30 days",
+    "interval": "30 days"
   }
 }

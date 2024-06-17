@@ -75,6 +75,11 @@ const accountSchema = mongoose.Schema({
     type: Date,
     required: false,
   },
+
+  experienceReducedAt: {
+    type: Date,
+    required: false,
+  },
 });
 
 /**
