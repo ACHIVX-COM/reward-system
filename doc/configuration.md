@@ -163,3 +163,69 @@ The job is configured by `"experienceReduction"` section of gamification configu
   }
 }
 ```
+
+### Medals
+
+TBD
+
+##### Action-based medals
+
+A medal that user receives for specified number of certain actions within a time frame, e.g. for writing 10 posts in one month.
+
+The medal can be recalled automatically if user does not perform another number of same actions within some time frame.
+E.g. if user does not write any posts for another month.
+
+```JavaScript
+{
+  // ...
+  "medals": {
+    // ...
+    "MyMedal": {
+      "type": "ActionBased",
+
+      // Weights of actions taken into account for this medal.
+      //
+      // When checking if a user is eligible for certain rank of this medal, the system will search for all actions of these types.
+      // Then it will compute a user score as sum of number of actions of each type multiplied by weight of the type.
+      // Ant then it will give the user a medal if the score is higher than a threshold specified for the rank.
+      "actions": {
+        "WritePost": 1,
+
+        // The weight may be negative, so, for example, each banned post will cancel out two written posts.
+        "GetPostBanned": -2
+      },
+      "ranks": [
+        {
+          // Higher value for a more difficult rank to achieve.
+          // This number is returned when fetching user medals using RPC.
+          // It's up to you, how it will be displayed to user - for example, you can display rank 10 as "silver medal" and rank 100 as "golden medal".
+          "rank": 10,
+
+          // Duration for which the actions should be performed
+          "period": "31 days",
+
+          // Score necessary to get this rank of this medal
+          "threshold": 15
+        },
+        {
+          "rank": 100,
+          "period": "93 days",
+          "threshold": 45
+        }
+      ],
+      "recall": {
+        // Enables automatic recall of a medal.
+        // When enabled, users with this medal will lose it if their score gets below specified threshold.
+        "enabled": true,
+
+        // Time period for which the score is calculated when checking for medal recall.
+        "period": "31 days",
+
+        // Score threshold.
+        // If score for the period gets below this value, the user will lose the medal.
+        "threshold": 7
+      }
+    }
+  }
+}
+```

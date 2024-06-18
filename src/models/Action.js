@@ -4,6 +4,7 @@ const actionSchema = mongoose.Schema(
   {
     account: {
       type: mongoose.Types.ObjectId,
+      ref: "Account",
       required: true,
     },
     action: {
@@ -42,6 +43,7 @@ actionSchema.index(
 );
 
 actionSchema.index({ account: 1, createdAt: -1 });
+actionSchema.index({ action: 1, createdAt: -1 });
 
 /**
  * @type {mongoose.Model}

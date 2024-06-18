@@ -38,6 +38,32 @@
       "repeatable": true
     }
   },
+  "medals": {
+    "Author": {
+      "type": "ActionBased",
+      "actions": {
+        "WritePost": 1,
+        "GetPostBanned": -1
+      },
+      "ranks": [
+        {
+          "rank": 10,
+          "period": "31 days",
+          "threshold": 15
+        },
+        {
+          "rank": 100,
+          "period": "93 days",
+          "threshold": 45
+        }
+      ],
+      "recall": {
+        "enabled": true,
+        "period": "31 days",
+        "threshold": 7
+      }
+    }
+  },
   "experienceReduction": {
     "enabled": true,
     "amount": 200,

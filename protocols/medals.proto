@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+package achivx.medals;
+
+service Medals {
+  rpc GetAccountMedals(AccountMedalsRequest) returns (stream AccountMedal);
+}
+
+message AccountMedalsRequest {
+  string account = 1;
+}
+
+message AccountMedal {
+  string medal = 1;
+  string rank = 2;
+}
