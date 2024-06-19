@@ -5,6 +5,9 @@ const { createTransactions } = require("./internalTransactionsService");
 const isMongodbDuplicationError = require("../utils/isMongodbDuplicationError");
 const { default: Decimal } = require("decimal.js-light");
 const { STATUSES } = require("../models/InternalTransaction");
+const { medalTypes } = require("../gamification");
+const { MedalModel } = require("../models/Medal");
+const asyncGenChunks = require("../utils/asyncGenChunks");
 
 const gamificationConfig = require(
   process.env.GAMIFICATION_CONFIG_PATH ?? "../../config/gamification.json",
@@ -70,6 +73,22 @@ class LevelsConfig {
 }
 
 const levelsConfig = new LevelsConfig(gamificationConfig.levels);
+
+/**
+ * @type {import('../gamification/Medal')[]}
+ */
+const medals = Object.entries(gamificationConfig.medals ?? {}).map(
+  ([name, { type, ...config }]) => {
+    const MedalType = medalTypes.get(type);
+
+    assert.ok(
+      MedalType,
+      `Medal type for medal "${name}" must be a valid medal type name but is "${type}"`,
+    );
+
+    return new MedalType({ name, config });
+  },
+);
 
 /**
  * Pays rewards for level upgrade.
@@ -359,3 +378,68 @@ module.exports.getXpReductionConfiguration =
 
     return { enabled, amount, delay, interval };
   };
+
+module.exports.updateMedals = async function updateMedals() {
+  for (const medal of medals) {
+    console.log(`Updating medal ${medal.name}...`);
+
+    let upgraded = 0;
+    let awarded = 0;
+
+    for await (const eligibleChunk of asyncGenChunks(medal.findEligible())) {
+      const bulkOps = [];
+
+      for (const eligible of eligibleChunk) {
+        bulkOps.push(
+          {
+            updateOne: {
+              filter: {
+                account: eligible.account,
+                rank: { $lt: eligible.rank },
+                medal: medal.name,
+              },
+              update: { $set: { rank: eligible.rank } },
+              upsert: false,
+            },
+          },
+          {
+            updateOne: {
+              filter: { account: eligible.account, medal: medal.name },
+              update: {
+                $setOnInsert: {
+                  account: eligible.account,
+                  rank: eligible.rank,
+                  medal: medal.name,
+                },
+              },
+              upsert: true,
+            },
+          },
+        );
+      }
+
+      const { upsertedCount, modifiedCount } =
+        await MedalModel.bulkWrite(bulkOps);
+
+      awarded += upsertedCount;
+      upgraded += modifiedCount;
+    }
+
+    console.log(
+      `Awarded ${awarded} user(s) with ${medal.name} medal, ${upgraded} user(s) upgraded`,
+    );
+
+    let recalled = 0;
+
+    for await (const unworthyChunk of asyncGenChunks(medal.findUnworthy())) {
+      const { deletedCount } = await MedalModel.deleteMany({
+        medal: medal.name,
+        account: { $in: unworthyChunk },
+      });
+
+      recalled += deletedCount;
+    }
+
+    console.log(`Recalled ${recalled} ${medal.name} medal(s)`);
+  }
+};

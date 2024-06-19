@@ -99,11 +99,35 @@ The service will use standard TRC20 transactions if `extImplAddress` is not set.
 
 ## Gamification configuration
 
-TBD
+ACHIVX Reward System includes a gamification functionality - user actions tracking, rewards for actions, experience, levels, etc. 
+This functionality is configured by a JSON file pointed by `GAMIFICATION_CONFIG_PATH` environment variable or by a [default file](../config/gamification.json).
 
 ### Levels
 
-TBD
+Levels are configured in `"levels"` section of gamification configuration file.
+
+The section is an array of objects describing each level, starting with level 1.
+Note that a user starts with level 0, which is not described in configuration.
+If you want your user to start with level 1, you'll have to increment level values received from ACHIVX Reward System by 1.
+
+```JavaScript
+{
+  // ...
+  "levels": [
+    { // Level 1
+      // User experience to reach this level
+      "xp": 100,
+
+      // Reward the user receives for achieving this level
+      "reward": 10
+    },
+    {
+      "xp": 200,
+      "reward": 20
+    }
+  ]
+}
+```
 
 ### Actions
 
@@ -166,7 +190,10 @@ The job is configured by `"experienceReduction"` section of gamification configu
 
 ### Medals
 
-TBD
+Medals are *decorative* rewards given to users on conditions depending on medal type and settings.
+Medals are configured in `"medals"` section of gamification configuration file.
+
+In order to give medals to users you should run `update-medals` [job](./jobs.md) periodically.
 
 ##### Action-based medals
 

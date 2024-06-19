@@ -16,6 +16,7 @@ const blockchainCurrenciesRPCs = require("./rpcs/blockchainCurrencies");
 const blockchainNetworksRPCs = require("./rpcs/blockchainNetworks");
 const transactionsRPCs = require("./rpcs/transactions");
 const jobsRPCs = require("./rpcs/jobs");
+const medalRPCs = require("./rpcs/medals");
 
 const packageDefinition = protoLoader.loadSync(
   path.resolve(__dirname, "../../protocols/index.proto"),
@@ -50,6 +51,7 @@ function addServices(server) {
     blockchainNetworksRPCs,
   );
   server.addService(grpcPackage.achivx.jobs.Jobs.service, jobsRPCs);
+  server.addService(grpcPackage.achivx.medals.Medals.service, medalRPCs);
 }
 
 async function main() {

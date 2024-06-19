@@ -3,6 +3,7 @@ syntax = "proto3";
 package achivx.medals;
 
 service Medals {
+  // Returns list of medals currently owned by given user
   rpc GetAccountMedals(AccountMedalsRequest) returns (stream AccountMedal);
 }
 

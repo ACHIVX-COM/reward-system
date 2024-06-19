@@ -93,7 +93,7 @@ module.exports = class ActionBasedMedal extends Medal {
   async _getAccountScore(accountId, now, since) {
     const actionScores = await Promise.all(
       Object.entries(this._actionWeights).map(
-        async (action, weight) =>
+        async ([action, weight]) =>
           weight *
           (await ActionModel.countDocuments({
             account: accountId,
