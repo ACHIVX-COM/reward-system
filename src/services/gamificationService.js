@@ -8,6 +8,7 @@ const { STATUSES } = require("../models/InternalTransaction");
 const { medalTypes } = require("../gamification");
 const { MedalModel } = require("../models/Medal");
 const asyncGenChunks = require("../utils/asyncGenChunks");
+const { useMongodbSession } = require("../utils/useMongoSession");
 
 const gamificationConfig = require(
   process.env.GAMIFICATION_CONFIG_PATH ?? "../../config/gamification.json",
@@ -359,6 +360,42 @@ module.exports.createAction = async function createAction(
  */
 module.exports.getLevelByXp = function getLevelByXp(xp) {
   return levelsConfig.getLevelByXp(xp);
+};
+
+module.exports.payLostLevelupRewards = async function payLostLevelupRewards() {
+  for (const level of levelsConfig.levels) {
+    if (level.reward <= 0) {
+      continue;
+    }
+
+    for await (const account of AccountModel.find({
+      experience: { $gte: level.xp },
+      rewardedLevel: { $lt: level.id },
+    })) {
+      await useMongodbSession(async (session) => {
+        const acc = await AccountModel.findOne(
+          {
+            _id: account._id,
+            experience: { $gte: level.xp },
+            rewardedLevel: { $lt: level.id },
+          },
+          null,
+          { session },
+        );
+
+        if (!acc) {
+          return;
+        }
+
+        await rewardAccountLevelUp(
+          account._id,
+          acc.rewardedLevel,
+          levelsConfig.getLevelByXp(acc.experience),
+          session,
+        );
+      });
+    }
+  }
 };
 
 module.exports.getActionsConfigurations = function getActionsConfigurations() {

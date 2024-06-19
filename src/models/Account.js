@@ -88,6 +88,8 @@ const accountSchema = mongoose.Schema({
   },
 });
 
+accountSchema.index({ rewardedLevel: 1, experience: 1 });
+
 /**
  * @type {mongoose.Model}
  */
