@@ -47,6 +47,12 @@ const accountSchema = mongoose.Schema({
     index: true,
     unique: true,
   },
+
+  registeredAt: {
+    type: Date,
+    default: () => new Date(),
+  },
+
   balance: {
     type: mongoose.Types.Decimal128,
     default: 0,

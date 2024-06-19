@@ -64,6 +64,9 @@ message AccountDetailsResponse {
     // Timestamp of most recent account activity, encoded as ISO-8601 string.
     // Can be updated by TrackAccountActivity or when creating an Action.
     string lastActiveAt = 6;
+
+    // Account registration date, encoded as ISO-8601 string.
+    string registeredAt = 7;
 }
 
 message AccountUpsertRequest {
@@ -74,6 +77,11 @@ message AccountUpsertRequest {
     // Note that even if the account identifiers are numbers, they are still compared as strings.
     // So, for example "1", "01", "1.0" are three different account identifiers.
     string id = 1;
+
+    // Account registration date, encoded as ISO-8601 string.
+    //
+    // Defaults to previously provided value (if account document already exists) or current date (if it doesn't).
+    optional string registeredAt = 2;
 }
 
 message AccountActivityTrackRequest {

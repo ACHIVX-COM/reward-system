@@ -1,20 +1,23 @@
 const mongoose = require("mongoose");
 
-const medalSchema = mongoose.Schema({
-  account: {
-    type: mongoose.Types.ObjectId,
-    ref: "Account",
-    required: true,
+const medalSchema = mongoose.Schema(
+  {
+    account: {
+      type: mongoose.Types.ObjectId,
+      ref: "Account",
+      required: true,
+    },
+    medal: {
+      type: String,
+      required: true,
+    },
+    rank: {
+      type: Number,
+      required: true,
+    },
   },
-  medal: {
-    type: String,
-    required: true,
-  },
-  rank: {
-    type: Number,
-    required: true,
-  },
-});
+  { read: "secondaryPreferred" },
+);
 
 medalSchema.index({ medal: 1, account: 1 }, { unique: true });
 

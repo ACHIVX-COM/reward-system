@@ -15,6 +15,7 @@ function accountToDetailedResponse(account) {
     experience: account.experience,
     level: getLevelByXp(account.experience),
     lastActiveAt: account.lastActiveAt?.toISOString(),
+    registeredAt: account.registeredAt?.toISOString(),
   };
 }
 
@@ -42,16 +43,30 @@ module.exports.UpsertAccount = unaryAsyncImpl(async (call) => {
   await authenticateCall(call);
 
   const {
-    request: { id },
+    request: { id, registeredAt },
   } = call;
 
   if (!id) {
     throw new InvalidArgument("Missing account ID");
   }
 
+  const update = { $set: { externalId: id } };
+
+  if (registeredAt) {
+    const parsed = new Date(registeredAt);
+
+    if (isNaN(parsed.getTime())) {
+      throw new InvalidArgument("Invalid registeredAt date");
+    }
+
+    update.$set.registeredAt = parsed;
+  } else {
+    update.$setOnInsert = { registeredAt: new Date() };
+  }
+
   const account = await AccountModel.findOneAndUpdate(
     { externalId: id },
-    { $set: { externalId: id } },
+    update,
     { upsert: true, new: true },
   );
 

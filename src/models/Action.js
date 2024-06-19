@@ -28,7 +28,7 @@ const actionSchema = mongoose.Schema(
       default: 0,
     },
   },
-  { timestamps: true },
+  { timestamps: true, read: "secondaryPreferred" },
 );
 
 actionSchema.index(

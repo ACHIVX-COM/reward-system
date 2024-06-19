@@ -203,7 +203,9 @@ module.exports.GetTransactionsList = streamAsyncImpl(async function* (call) {
           },
           { $unwind: "$account" },
         ]),
-  ]).cursor();
+  ])
+    .read("secondaryPreferred")
+    .cursor();
 
   for await (const doc of cursor) {
     if (call.cancelled) {
@@ -405,7 +407,7 @@ module.exports.RestoreWithdrawalStatus = unaryAsyncImpl(async (call) => {
 
   if (!ALLOWED_RESTORE_TARGET_STATUSES.includes(status)) {
     throw new InvalidArgument(
-      `Illegall target status. Allowed statuses are: ${ALLOWED_RESTORE_TARGET_STATUSES.join(", ")}`,
+      `Illegal target status. Allowed statuses are: ${ALLOWED_RESTORE_TARGET_STATUSES.join(", ")}`,
     );
   }
 

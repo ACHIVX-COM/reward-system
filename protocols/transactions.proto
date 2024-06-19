@@ -124,7 +124,10 @@ message TransactionWithdrawalDetails {
   // URL of the transaction in blockchain explorer such as tronscan or etherscan
   string transactionUrl = 6;
 
-  // Text of the last error
+  // Text of the last error.
+  //
+  // Note that this field may exist for a successfully completed transaction.
+  // Use transaction status to determine if transaction was successful or not.
   string error = 7;
 }
 
