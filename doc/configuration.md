@@ -195,7 +195,7 @@ Medals are configured in `"medals"` section of gamification configuration file.
 
 In order to give medals to users you should run `update-medals` [job](./jobs.md) periodically.
 
-##### Action-based medals
+#### Action-based medals
 
 A medal that user receives for specified number of certain actions within a time frame, e.g. for writing 10 posts in one month.
 
@@ -252,6 +252,35 @@ E.g. if user does not write any posts for another month.
         // If score for the period gets below this value, the user will lose the medal.
         "threshold": 7
       }
+    }
+  }
+}
+```
+
+#### Age-based medals
+
+A medal user receives for being registered for specified amount of time.
+
+```JavaScript
+{
+  // ...
+  "medals": {
+    // ...
+    "MyMedal": {
+      "type": "AgeBased",
+
+      "ranks": [
+        {
+          // Should be a higher value for larger ages
+          "rank": 10,
+          // Age (time since registration) necessary to receive this rank
+          "age": "31 days"
+        },
+        {
+          "rank": 100,
+          "age": "1 year"
+        }
+      ]
     }
   }
 }

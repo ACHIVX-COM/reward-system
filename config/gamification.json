@@ -39,6 +39,39 @@
     }
   },
   "medals": {
+    "Inhabitant": {
+      "type": "AgeBased",
+      "ranks": [
+        {
+          "rank": 3,
+          "age": "1 week"
+        },
+        {
+          "rank": 5,
+          "age": "4 weeks"
+        },
+        {
+          "rank": 7,
+          "age": "8 weeks"
+        },
+        {
+          "rank": 10,
+          "age": "24 weeks"
+        },
+        {
+          "rank": 20,
+          "age": "1 year"
+        },
+        {
+          "rank": 100,
+          "age": "5 years"
+        },
+        {
+          "rank": 200,
+          "age": "10 years"
+        }
+      ]
+    },
     "Author": {
       "type": "ActionBased",
       "actions": {

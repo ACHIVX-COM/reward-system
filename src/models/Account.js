@@ -50,6 +50,7 @@ const accountSchema = mongoose.Schema({
 
   registeredAt: {
     type: Date,
+    index: true,
     default: () => new Date(),
   },
 
