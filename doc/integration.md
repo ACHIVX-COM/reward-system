@@ -15,7 +15,7 @@ Most of other procedures require ACHIVX Reward System to have information about 
 An account can be added to the ACHIVX Reward System by calling `achivx.accounts.Accounts/UpsertAccount` procedure:
 
 ```
-grpcurl --rpc-header "authentication:${AUTH_TOKEN}" -plaintext -d '{"id": "1"}' localhost:50051 achivx.accounts.Accounts/UpsertAccount     
+grpcurl --rpc-header "authentication:${AUTH_TOKEN}" -plaintext -d '{"id": "1"}' localhost:50051 achivx.accounts.Accounts/UpsertAccount
 {
   "id": "1",
   "balance": "0"
@@ -26,6 +26,7 @@ Currently it requires user's unique identifier (`id`) only.
 The response will contain current state of user record.
 
 Note that account identifiers are handled as strings, not integers:
+
 - any string is acceptable as account identifier.
   For example, you can use UUIDs as account identifiers.
   But don't use identifiers that may change over time, such as nicknames, emails, phone numbers, etc.
@@ -139,7 +140,7 @@ In order to help you avoid duplication of networks/currencies lists and blockcha
 For example, lists of supported networks and currencies can be acquired by calling `achivx.blockchain.Networks/GetNetworks` and `achivx.blockchain.Currencies/GetCurrencies`:
 
 ```
-grpcurl --rpc-header "authentication:${AUTH_TOKEN}" --plaintext -d '{}' localhost:50051 achivx.blockchain.Networks/GetNetworks    
+grpcurl --rpc-header "authentication:${AUTH_TOKEN}" --plaintext -d '{}' localhost:50051 achivx.blockchain.Networks/GetNetworks
 {
   "name": "Tron-Main",
   "typeName": "Tron"
@@ -182,7 +183,7 @@ When users have a withdrawal wallet they can request withdrawal of tokens.
 This is done by calling `achivx.transactions.Transactions/RequestWithdrawal`:
 
 ```
-grpcurl --rpc-header "authentication:${AUTH_TOKEN}" --plaintext -d '{"account": "1", "currency": "ACHIVX_Tron", "rate": "1", "amount": "0.000001"}' localhost:50051 achivx.transactions.Transactions/RequestWithdrawal 
+grpcurl --rpc-header "authentication:${AUTH_TOKEN}" --plaintext -d '{"account": "1", "currency": "ACHIVX_Tron", "rate": "1", "amount": "0.000001"}' localhost:50051 achivx.transactions.Transactions/RequestWithdrawal
 {
   "id": "66547014340d2b2bdac31e69",
   "account": "1",
@@ -250,8 +251,92 @@ If it cannot be determined after some timeout (1 day by default for TRC20 curren
 In the worst case an error happens while sending the transaction and the job cannot determine it's reason and if it's safe to send the transaction again.
 Transaction status changes to `SEND_UNKNOWN_ERROR` in such case.
 Transactions in this status will not be handled automatically and require manual actions.
-After checking the status of transaction manually you should call `achivx.transactions.Transactions/RestoreWithdrawalStatus` procedure to chage it status to either `SEND_FAILED`, `DENIED` or `MINED`.
+After checking the status of transaction manually you should call `achivx.transactions.Transactions/RestoreWithdrawalStatus` procedure to change it status to either `SEND_FAILED`, `DENIED` or `MINED`.
 
 ## Tracking user actions and activity
 
-TBD
+Along with low level transactions API, ACHIVX Reward System provides a higher-level API for gamification.
+
+User actions tracking is the most fundamental part of this gamification API.
+Besides just keeping record of user activity, actions can be rewarded by giving users experience points and/or tokens.
+List of trackable actions is defined in [gamification configuration file](./configuration.md#actions).
+It can be retrieved using `achivx.actions.Actions/GetActionsConfiguration` procedure:
+
+```
+grpcurl --rpc-header 'authentication:${AUTH_TOKEN}' -plaintext localhost:50051 achivx.actions.Actions/GetActionsConfiguration 
+{
+  "name": "WritePost",
+  "xp": 1,
+  "reward": 0.1,
+  "repeatable": true
+}
+{
+  "name": "WriteFirstPost",
+  "xp": 10,
+  "reward": 0.5
+}
+{
+  "name": "GetPostBanned",
+  "xp": -2,
+  "reward": -1,
+  "repeatable": true
+}
+```
+
+Actions are tracked using `achivx.actions.Actions/CreateAction` procedure:
+
+```
+grpcurl --rpc-header 'authentication:${AUTH_TOKEN}' -plaintext -d '{"account": "1", "action": "WritePost", "key": "p-1"}' localhost:50051 achivx.actions.Actions/CreateAction
+{
+  "action": "WritePost",
+  "key": "p-1",
+  "createdAt": "2024-06-13T09:29:17.574Z",
+  "experience": 1,
+  "reward": 0.1
+}
+```
+
+Using it's arguments, you can override default experience and reward values.
+
+Actions influence user's experience and level, as well as last activity timestamp (the last one can be updated without creating an action by calling `achivx.accounts.Accounts/TrackAccountActivity`).
+These properties can be received using the previously mentioned `achivx.accounts.Accounts/GetAccountDetails` procedure:
+
+```
+grpcurl --rpc-header 'authentication:${AUTH_TOKEN}' -plaintext -d '{"id": "1"}' localhost:50051 achivx.accounts.Accounts/GetAccountDetails
+{
+  "id": "1",
+  "balance": "0.100000",
+  "experience": 420,
+  "level": 1,
+  "lastActiveAt": "2024-06-13T09:29:17.574Z"
+}
+```
+
+History of user's actions may be fetched using `achivx.actions.Actions/GetAccountActions` RPC:
+
+```
+grpcurl --rpc-header 'authentication:${AUTH_TOKEN}' -plaintext -d '{"account": "1"}' localhost:50051 achivx.actions.Actions/GetAccountActions
+{
+  "action": "WritePost",
+  "key": "p-1",
+  "createdAt": "2024-06-13T09:29:17.574Z",
+  "experience": 1,
+  "reward": 0.1
+}
+```
+
+## Getting user medals
+
+Medals are another gamification-related feature.
+They provide decorative distinction for some users.
+List of user's medals can be retrieved using `achivx.medals.Medals/GetAccountMedals` procedure:
+
+```
+grpcurl --rpc-header 'authentication:${AUTH_TOKEN}' -plaintext -d '{"account": "1"}' localhost:50051 achivx.medals.Medals/GetAccountMedals
+{
+  "medal": "Author",
+  "rank": "10"
+}
+```
+
+Note that in order to update medals owned by a user you should regularly run `update-medals` [job](./jobs.md).
