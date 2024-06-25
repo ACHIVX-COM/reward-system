@@ -1,0 +1,21 @@
+syntax = "proto3";
+
+package achivx.leader_boards;
+
+service LeaderBoards {
+  rpc GetLeaderBoard(GetLeaderBoardRequest) returns (GetLeaderBoardResponse);
+}
+
+message GetLeaderBoardRequest {
+  string leaderBoard = 1;
+}
+
+message LeaderEntry {
+  string account = 1;
+  float score = 2;
+}
+
+message GetLeaderBoardResponse {
+  repeated LeaderEntry leaders = 1;
+  string updatedAt = 2;
+}

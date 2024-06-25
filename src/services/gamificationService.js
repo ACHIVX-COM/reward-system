@@ -5,7 +5,7 @@ const { createTransactions } = require("./internalTransactionsService");
 const isMongodbDuplicationError = require("../utils/isMongodbDuplicationError");
 const { default: Decimal } = require("decimal.js-light");
 const { STATUSES } = require("../models/InternalTransaction");
-const { medalTypes } = require("../gamification");
+const { medalTypes, leaderBoardTypes } = require("../gamification");
 const { MedalModel } = require("../models/Medal");
 const asyncGenChunks = require("../utils/asyncGenChunks");
 const { useMongodbSession } = require("../utils/useMongoSession");
@@ -88,6 +88,20 @@ const medals = Object.entries(gamificationConfig.medals ?? {}).map(
     );
 
     return new MedalType({ name, config });
+  },
+);
+
+/** @type {import('../gamification/LeaderBoard')[]} */
+const leaderBoards = Object.entries(gamificationConfig.leaderBoards ?? {}).map(
+  ([name, { type, ...config }]) => {
+    const LeaderBoardType = leaderBoardTypes.get(type);
+
+    assert.ok(
+      LeaderBoardType,
+      `Leader board type for leader board "${name}" must be a valid leader board type name but is "${type}"`,
+    );
+
+    return new LeaderBoardType({ name, config });
   },
 );
 
@@ -479,4 +493,8 @@ module.exports.updateMedals = async function updateMedals() {
 
     console.log(`Recalled ${recalled} ${medal.name} medal(s)`);
   }
+};
+
+module.exports.getLeaderBoards = function getLeaderBoards() {
+  return leaderBoards;
 };

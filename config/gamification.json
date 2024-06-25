@@ -97,6 +97,20 @@
       }
     }
   },
+  "leaderBoards": {
+    "Authors": {
+      "type": "ActionBased",
+      "actions": {
+        "WritePost": 1,
+        "GetPostBanned": -1
+      },
+      "size": 10
+    },
+    "Players": {
+      "type": "ExperienceBased",
+      "size": 10
+    }
+  },
   "experienceReduction": {
     "enabled": true,
     "amount": 200,

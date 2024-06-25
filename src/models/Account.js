@@ -66,6 +66,7 @@ const accountSchema = mongoose.Schema({
 
   experience: {
     type: Number,
+    index: 1,
     default: 0,
     min: 0,
   },

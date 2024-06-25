@@ -5,6 +5,7 @@ require("../models/InternalTransaction");
 require("../models/JobStatusModel");
 require("../models/Action");
 require("../models/Medal");
+require("../models/LeaderBoardSnapshot");
 
 module.exports.mongoose = mongoose;
 
