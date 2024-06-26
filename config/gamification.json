@@ -82,7 +82,7 @@
         {
           "rank": 10,
           "period": "31 days",
-          "threshold": 2
+          "threshold": 15
         },
         {
           "rank": 100,
