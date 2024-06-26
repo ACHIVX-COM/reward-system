@@ -99,7 +99,7 @@ The service will use standard TRC20 transactions if `extImplAddress` is not set.
 
 ## Gamification configuration
 
-ACHIVX Reward System includes a gamification functionality - user actions tracking, rewards for actions, experience, levels, etc. 
+ACHIVX Reward System includes a gamification functionality - user actions tracking, rewards for actions, experience, levels, etc.
 This functionality is configured by a JSON file pointed by `GAMIFICATION_CONFIG_PATH` environment variable or by a [default file](../config/gamification.json).
 
 ### Levels
@@ -190,7 +190,7 @@ The job is configured by `"experienceReduction"` section of gamification configu
 
 ### Medals
 
-Medals are *decorative* rewards given to users on conditions depending on medal type and settings.
+Medals are _decorative_ rewards given to users on conditions depending on medal type and settings.
 Medals are configured in `"medals"` section of gamification configuration file.
 
 In order to give medals to users you should run `update-medals` [job](./jobs.md) periodically.
@@ -281,6 +281,62 @@ A medal user receives for being registered for specified amount of time.
           "age": "1 year"
         }
       ]
+    }
+  }
+}
+```
+
+### Leader boards
+
+Leader boards provide list of best (by different metrics, depending on the leader board type and settings) users.
+Leader boards are configured using `"leaderBoards"` section of gamification configuration file.
+The section is an object where a key is a name of the leader board and the value is leader board settings object.
+
+Leader boards are updated by [jobs](./jobs.md) named `update-leader-board@<leader board name>`.
+
+#### Experience-based leader board
+
+This type of leader board shows users with highest experience scores.
+It usually doesn't make sense to have more than one leader board of this type.
+
+```JavaScript
+{
+  // ...
+  "leaderBoards": {
+    // ...
+    "MostExperienced": {
+      "type": "ExperienceBased",
+
+      // Number of users on a leader board
+      "size": 100
+    }
+  }
+}
+```
+
+#### Action-based leader board
+
+This type of leader board ranks users based on number of actions they have performed.
+Just like with action-based medals, it's possible to take multiple actions into account, as well as assign negative weights to some actions:
+
+```JavaScript
+{
+  // ...
+  "leaderBoards": {
+    // ...
+    "Authors": {
+      "type": "ActionBased",
+
+      // Weights of actions taken into account.
+      //
+      // Alike to same property of action-based medals.
+      "actions": {
+        "WritePost": 1,
+        "GetPostBanned": -1
+      },
+
+      // Number of users on a leader board
+      "size": 10
     }
   }
 }

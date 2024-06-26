@@ -263,7 +263,7 @@ List of trackable actions is defined in [gamification configuration file](./conf
 It can be retrieved using `achivx.actions.Actions/GetActionsConfiguration` procedure:
 
 ```
-grpcurl --rpc-header 'authentication:${AUTH_TOKEN}' -plaintext localhost:50051 achivx.actions.Actions/GetActionsConfiguration 
+grpcurl --rpc-header 'authentication:${AUTH_TOKEN}' -plaintext localhost:50051 achivx.actions.Actions/GetActionsConfiguration
 {
   "name": "WritePost",
   "xp": 1,
@@ -340,3 +340,41 @@ grpcurl --rpc-header 'authentication:${AUTH_TOKEN}' -plaintext -d '{"account": "
 ```
 
 Note that in order to update medals owned by a user you should regularly run `update-medals` [job](./jobs.md).
+
+## Getting leader boards
+
+Leader boards provide lists of best (according to certain criteria) users.
+The set of leader boards is [configured using a gamification configuration file](./configuration.md#leader-boards).
+Available leader board names can be retrieved using `achivx.leader_boards.LeaderBoards/GetLeaderBoardsList` procedure:
+
+```
+grpcurl --rpc-header 'authentication:${AUTH_TOKEN}' -plaintext localhost:50051 achivx.leader_boards.LeaderBoards/GetLeaderBoardsList
+{
+  "name": "Authors"
+}
+{
+  "name": "Players"
+}
+```
+
+To get content of specific leader board use `achivx.leader_boards.LeaderBoards/GetLeaderBoard` procedure:
+
+```
+grpcurl --rpc-header 'authentication:${AUTH_TOKEN}' -plaintext -d '{"leaderBoard": "Authors"}' localhost:50051 achivx.leader_boards.LeaderBoards/GetLeaderBoard
+{
+  "leaders": [
+    {
+      "account": "1",
+      "score": 8
+    },
+    {
+      "account": "2",
+      "score": 1
+    }
+  ],
+  "updatedAt": "2024-06-25T11:34:02.076Z"
+}
+```
+
+Leader boards should be updated regularly by executing `update-leader-board@<leader board name>` [job](./jobs.md).
+`achivx.leader_boards.LeaderBoards/GetLeaderBoard` will fail with "failed precondition" code if the requested leader board wasn't ever updated.

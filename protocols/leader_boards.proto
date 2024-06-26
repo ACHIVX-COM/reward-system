@@ -3,19 +3,43 @@ syntax = "proto3";
 package achivx.leader_boards;
 
 service LeaderBoards {
+  // Returns list of configured leader boards.
+  //
+  // The list can be changed by changing gamification configuration file.
+  rpc GetLeaderBoardsList(GetLeaderBoardsListRequest) returns (stream LeaderBoardResponse);
+
+  // Returns current content and status of single leader board.
+  //
+  // Responds with "precondition failed" code if the leader board wasn't updated yet.
   rpc GetLeaderBoard(GetLeaderBoardRequest) returns (GetLeaderBoardResponse);
 }
 
+message GetLeaderBoardsListRequest {}
+
+message LeaderBoardResponse {
+  string name = 1;
+}
+
 message GetLeaderBoardRequest {
+  // Name of leader board to get, as returned by LeaderBoards/GetLeaderBoardsList (and configured in gamification configuration).
   string leaderBoard = 1;
 }
 
 message LeaderEntry {
+  // Id of the leader account
   string account = 1;
+
+  // Score of the account.
+  // Semantic of the score depends on leader board type and settings.
+  // Usually higher value for higher places on leader board.
   float score = 2;
 }
 
 message GetLeaderBoardResponse {
+  // Accounts on the leader board.
+  // From the best one to the worst one.
   repeated LeaderEntry leaders = 1;
+
+  // Timestamp of most recent leader board update, encoded as ISO-8601 string.
   string updatedAt = 2;
 }

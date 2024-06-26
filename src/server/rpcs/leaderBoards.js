@@ -9,6 +9,7 @@ const {
   FailedPrecondition,
 } = require("../utils/errors");
 const unaryAsyncImpl = require("../utils/unaryAsyncImpl");
+const streamAsyncImpl = require("../utils/streamAsyncImpl");
 
 module.exports.GetLeaderBoard = unaryAsyncImpl(async (call) => {
   await authenticateCall(call);
@@ -40,4 +41,12 @@ module.exports.GetLeaderBoard = unaryAsyncImpl(async (call) => {
     })),
     updatedAt: leaderBoardDoc.updatedAt.toISOString(),
   };
+});
+
+module.exports.GetLeaderBoardsList = streamAsyncImpl(async function* (call) {
+  await authenticateCall(call);
+
+  for (const leaderBoard of getLeaderBoards()) {
+    yield { name: leaderBoard.name };
+  }
 });
