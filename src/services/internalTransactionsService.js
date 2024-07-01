@@ -18,6 +18,7 @@ module.exports.InsufficientFundsError = InsufficientFundsError;
 
 /**
  * @typedef {Object} TransactionCreationParameters
+ * @property {STATUSES} status
  * @property {mongoose.Types.ObjectId} account
  * @property {string} amount
  * @property {Object<string, string>} meta
@@ -29,6 +30,7 @@ module.exports.InsufficientFundsError = InsufficientFundsError;
  * @param {TransactionCreationParameters[]} parameters
  * @param {mongoose.ClientSession} session mongodb session
  * @returns {Promise<InternalTransactionModel>}
+ * @throws {InsufficientFundsError} if at least one of accounts has its balance gone below zero. The mongodb transaction MUST be reverted in case of such error.
  */
 const createTransactions = (module.exports.createTransactions =
   async function createTransactions(parameters, session) {
