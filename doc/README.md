@@ -7,3 +7,5 @@
 [How to add support for new blockchain and currency types?](./extending-blockchain-support.md)
 
 [What are batch jobs used for and how to run them?](./jobs.md)
+
+[How does gamification functionality of ACHIVX Reward System work?](./gamification.md)
