@@ -1,0 +1,18 @@
+syntax = "proto3";
+
+package achivx.achievements;
+
+service Achievements {
+  rpc GetAccountAchievements(AccountAchievementsRequest) returns (stream AccountAchievement);
+}
+
+message AccountAchievementsRequest {
+  string account = 1;
+}
+
+message AccountAchievement {
+  string name = 1;
+  float progress = 2;
+  float maxProgress = 3;
+  optional string unlockedAt = 4;
+}

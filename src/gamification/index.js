@@ -2,6 +2,7 @@ const assert = require("assert");
 const requireAll = require("require-all");
 const Medal = require("./Medal");
 const LeaderBoard = require("./LeaderBoard");
+const Achievement = require("./Achievement");
 
 const medalTypes = (module.exports.medalTypes = new Map());
 
@@ -32,5 +33,21 @@ requireAll({
     );
 
     leaderBoardTypes.set(module.typeName, module);
+  },
+});
+
+const achievementTypes = (module.exports.achievementTypes = new Map());
+
+requireAll({
+  dirname: __dirname,
+  filter: /\.achievement\.js$/,
+  excludeDirs: /^(\.|node_modules$)/,
+  resolve(module) {
+    assert.ok(
+      module.prototype instanceof Achievement,
+      "Default export of achievement module must be a Achievement subclass",
+    );
+
+    achievementTypes.set(module.typeName, module);
   },
 });

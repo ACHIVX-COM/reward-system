@@ -5,7 +5,11 @@ const { createTransactions } = require("./internalTransactionsService");
 const isMongodbDuplicationError = require("../utils/isMongodbDuplicationError");
 const { default: Decimal } = require("decimal.js-light");
 const { STATUSES } = require("../models/InternalTransaction");
-const { medalTypes, leaderBoardTypes } = require("../gamification");
+const {
+  medalTypes,
+  leaderBoardTypes,
+  achievementTypes,
+} = require("../gamification");
 const { MedalModel } = require("../models/Medal");
 const asyncGenChunks = require("../utils/asyncGenChunks");
 const { useMongodbSession } = require("../utils/useMongoSession");
@@ -13,6 +17,31 @@ const { useMongodbSession } = require("../utils/useMongoSession");
 const gamificationConfig = require(
   process.env.GAMIFICATION_CONFIG_PATH ?? "../../config/gamification.json",
 );
+
+/**
+ * @typedef {Object} ActionConfig
+ * @property {number?} xp
+ * @property {number?} reward
+ * @property {boolean?} repeatable
+ * @property {boolean?} trackActivity
+ */
+
+/**
+ * Name of an action recorded when a user unlocks an achievement.
+ *
+ * The key of an action is the achievement's name.
+ */
+const UNLOCK_ACHIEVEMENT_ACTION = (module.exports.UNLOCK_ACHIEVEMENT_ACTION =
+  "achivx.UnlockAchievement");
+
+/** @type {Record<string, ActionConfig>} */
+const actionConfigs = {
+  ...(gamificationConfig.actions ?? {}),
+  [UNLOCK_ACHIEVEMENT_ACTION]: {
+    repeatable: true,
+    trackActivity: false,
+  },
+};
 
 /**
  * @typedef {Object} Level
@@ -103,6 +132,32 @@ const leaderBoards = Object.entries(gamificationConfig.leaderBoards ?? {}).map(
 
     return new LeaderBoardType({ name, config });
   },
+);
+
+/** @type {import('../gamification/Achievement')[]} */
+const achievements = Object.entries(gamificationConfig.achievements ?? {}).map(
+  ([name, { type, ...config }]) => {
+    const AchievementType = achievementTypes.get(type);
+
+    assert.ok(
+      AchievementType,
+      `Achievement type for achievement "${name}" must be a valid type name but is "${type}"`,
+    );
+
+    return new AchievementType({ name, config });
+  },
+);
+
+/**
+ * Map from action name to list of achievements that may be unlocked by that action.
+ */
+const achievementsByAction = new Map(
+  Object.keys(actionConfigs).map((actionName) => [
+    actionName,
+    achievements.filter((achievement) =>
+      achievement.trackedActions.has(actionName),
+    ),
+  ]),
 );
 
 /**
@@ -249,6 +304,53 @@ async function payActionReward(accountId, reward, meta, session) {
   );
 }
 
+/**
+ * @param {import('mongoose').Types.ObjectId} account
+ * @param {string} action
+ * @param {import('mongoose').mongo.ClientSession} session
+ * @returns
+ */
+async function processActionAchievements(account, action, session) {
+  const relevantAchievements = achievementsByAction.get(action) ?? [];
+
+  if (relevantAchievements.length === 0) {
+    return;
+  }
+
+  const relevantAchievementsNames = relevantAchievements.map((it) => it.name);
+
+  const unlockedRelevantAchievements = new Set(
+    await ActionModel.distinct("key", {
+      account,
+      action: UNLOCK_ACHIEVEMENT_ACTION,
+      key: { $in: relevantAchievementsNames },
+    }),
+  );
+
+  const achievementsToUnlock = (
+    await Promise.all(
+      relevantAchievements
+        .filter((it) => !unlockedRelevantAchievements.has(it.name))
+        .map(async (it) => [it, await it.getUserProgress(account)]),
+    )
+  ).flatMap(([achievement, progress]) =>
+    progress >= achievement.maxProgress ? [achievement] : [],
+  );
+
+  for (const achievement of achievementsToUnlock) {
+    await createAction(
+      {
+        accountId: account,
+        action: UNLOCK_ACHIEVEMENT_ACTION,
+        experienceOverride: achievement.experience,
+        key: achievement.name,
+        rewardOverride: achievement.reward,
+      },
+      session,
+    );
+  }
+}
+
 const InvalidActionError =
   (module.exports.InvalidActionError = class InvalidActionError extends (
     Error
@@ -279,13 +381,13 @@ const DuplicateActionError =
  * @throws {InvalidActionError} if the key is present for non-repeatable action
  * @throws {DuplicateActionError} if the action already exists
  */
-module.exports.createAction = async function createAction(
+const createAction = (module.exports.createAction = async function createAction(
   { accountId, action, key, experienceOverride, rewardOverride },
   session,
 ) {
   assert.ok(session);
 
-  const actionConfig = gamificationConfig.actions[action];
+  const actionConfig = actionConfigs[action];
 
   if (!actionConfig) {
     throw new InvalidActionError(`Unknown action name: ${action}`);
@@ -363,8 +465,10 @@ module.exports.createAction = async function createAction(
     session,
   );
 
+  await processActionAchievements(accountId, action, session);
+
   return actionDoc;
-};
+});
 
 /**
  * Returns user level based on user experience.
@@ -413,7 +517,7 @@ module.exports.payLostLevelupRewards = async function payLostLevelupRewards() {
 };
 
 module.exports.getActionsConfigurations = function getActionsConfigurations() {
-  return gamificationConfig.actions ?? {};
+  return actionConfigs;
 };
 
 module.exports.getXpReductionConfiguration =
@@ -497,4 +601,52 @@ module.exports.updateMedals = async function updateMedals() {
 
 module.exports.getLeaderBoards = function getLeaderBoards() {
   return leaderBoards;
+};
+
+/**
+ * Returns a list of achievements and progress of specified user in unlocking them.
+ *
+ * The list will include an entry for each achievement, including those the user has no progress on.
+ *
+ * @param {import('mongoose').Types.ObjectId} account
+ * @returns {AsyncGenerator<{achievement: import('../gamification/Achievement'), progress: number, unlockAction: {}?}>}
+ */
+module.exports.getAccountAchievements = async function* getAccountAchievements(
+  account,
+) {
+  const unlockActions = new Map(
+    (
+      await ActionModel.find({
+        account,
+        action: UNLOCK_ACHIEVEMENT_ACTION,
+      }).lean()
+    ).map((action) => [action.key, action]),
+  );
+
+  for (const achievement of achievements) {
+    if (unlockActions.has(achievement.name)) {
+      yield {
+        unlockAction: unlockActions.get(achievement.name),
+        achievement,
+        progress: achievement.maxProgress,
+      };
+    }
+  }
+
+  const progressPromises = achievements
+    .filter((it) => !unlockActions.has(it.name))
+    .map(async (achievement) => {
+      const progress = await achievement.getUserProgress(account);
+
+      return { achievement, progress };
+    });
+
+  for (const promise of progressPromises) {
+    const { achievement, progress } = await promise;
+
+    yield {
+      achievement,
+      progress,
+    };
+  }
 };

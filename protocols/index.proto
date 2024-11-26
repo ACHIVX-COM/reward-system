@@ -7,3 +7,4 @@ import "protocols/jobs.proto";
 import "protocols/transactions.proto";
 import "protocols/medals.proto";
 import "protocols/leader_boards.proto";
+import "protocols/achievements.proto";

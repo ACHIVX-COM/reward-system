@@ -18,6 +18,7 @@ const transactionsRPCs = require("./rpcs/transactions");
 const jobsRPCs = require("./rpcs/jobs");
 const medalRPCs = require("./rpcs/medals");
 const leaderBoardRPCs = require("./rpcs/leaderBoards");
+const achievementsRPCs = require("./rpcs/achievements");
 
 const packageDefinition = protoLoader.loadSync(
   path.resolve(__dirname, "../../protocols/index.proto"),
@@ -56,6 +57,10 @@ function addServices(server) {
   server.addService(
     grpcPackage.achivx.leader_boards.LeaderBoards.service,
     leaderBoardRPCs,
+  );
+  server.addService(
+    grpcPackage.achivx.achievements.Achievements.service,
+    achievementsRPCs,
   );
 }
 

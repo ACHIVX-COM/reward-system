@@ -27,15 +27,22 @@
       "reward": 0.1,
       "repeatable": true
     },
-    "WriteFirstPost": {
-      "xp": 10,
-      "reward": 0.5
-    },
     "GetPostBanned": {
       "xp": -2,
       "reward": -1,
       "trackActivity": false,
       "repeatable": true
+    }
+  },
+  "achievements": {
+    "WriteFirstPost": {
+      "type": "ActionBased",
+      "actions": {
+        "WritePost": 1
+      },
+      "threshold": 1,
+      "xp": 10,
+      "reward": 0.5
     }
   },
   "medals": {
