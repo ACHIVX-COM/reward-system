@@ -271,14 +271,13 @@ grpcurl --rpc-header 'authentication:${AUTH_TOKEN}' -plaintext localhost:50051 a
   "repeatable": true
 }
 {
-  "name": "WriteFirstPost",
-  "xp": 10,
-  "reward": 0.5
-}
-{
   "name": "GetPostBanned",
   "xp": -2,
   "reward": -1,
+  "repeatable": true
+}
+{
+  "name": "achivx.UnlockAchievement",
   "repeatable": true
 }
 ```
@@ -378,3 +377,20 @@ grpcurl --rpc-header 'authentication:${AUTH_TOKEN}' -plaintext -d '{"leaderBoard
 
 Leader boards should be updated regularly by executing `update-leader-board@<leader board name>` [job](./jobs.md).
 `achivx.leader_boards.LeaderBoards/GetLeaderBoard` will fail with "failed precondition" code if the requested leader board wasn't ever updated.
+
+## Getting user achievements
+
+User's progress in unlocking achievements can be requested using `achivx.achievements.Achievements/GetAccountAchievements` procedure:
+
+```
+grpcurl --rpc-header 'authentication:${AUTH_TOKEN}' -plaintext -d '{"account": "1"} localhost:50051 achivx.achievements.Achievements/GetAccountAchievements
+{
+  "name": "WriteFirstPost",
+  "progress": 1,
+  "maxProgress": 1,
+  "unlockedAt": "2024-11-26T12:44:57.790Z"
+}
+```
+
+The field `unlockedAt` will be present for unlocked achievements.
+Note that this procedure will return all achievements, including those, user has made no progress on (with `progress` of `0`).

@@ -162,6 +162,42 @@ The section is a JSON object where a key is an action name and the value is an o
 }
 ```
 
+### Achievements
+
+Achievements are configured in `"achievements"` section of gamification config file.
+The section is a JSON object where a key is an achievement name and the value is an object describing the achievement.
+
+```JavaScript
+{
+  // ...,
+  "achievements": {
+    "MyAchievement": {
+      // Achievement type. Currently "ActionBased" is the only supported type.
+      "type": "ActionBased",
+      // Action weights
+      "actions": {
+        "Action1": 1,
+        // The weight may be negative, so in this example user will unlock the
+        // achievement by performing 10 more "Action1"s than "AntiAction1"s.
+        // Note that the achievement will be unlocked the moment user has 10 more
+        // "Action1"s than "AntiAction1"s, even if they get 10 more "AntiAction1"s
+        // the moment later.
+        "AntiAction1": -1
+      },
+      // The total weight of actions user should perform.
+      // Must be a positive (greater than 0) number.
+      "threshold": 10,
+      // Amount of experience the user receives by unlocking the achievement.
+      // Optional, defaults to 0
+      "xp": 10,
+      // Amount of reward tokens the user receives by unlocking the achievement.
+      // Optional, defaults to 0
+      "reward": 2,
+    }
+  }
+}
+```
+
 ### XP Reduction
 
 ACHIVX Reward System provides a [job](./jobs.md) to reduce experience of inactive users.

@@ -3,6 +3,7 @@ syntax = "proto3";
 package achivx.achievements;
 
 service Achievements {
+  /// Returns list of all possible achievements and progress of given user in unlocking them.
   rpc GetAccountAchievements(AccountAchievementsRequest) returns (stream AccountAchievement);
 }
 
@@ -10,9 +11,15 @@ message AccountAchievementsRequest {
   string account = 1;
 }
 
+/// User's progress on one achievement
 message AccountAchievement {
+  /// Achievement name, as specified in gamification configuration file
   string name = 1;
+  /// User's progress.
   float progress = 2;
+  /// A progress threshold necessary to unlock the achievement.
   float maxProgress = 3;
+  /// Timestamp when the achievement was unlocked, encoded as an ISO-8601 string.
+  /// Not set for non-unlocked achievements.
   optional string unlockedAt = 4;
 }

@@ -8,10 +8,16 @@ Detailed instructions on [configuration](./configuration.md) and [usage](./integ
 Actions are the most basic element of gamification system.
 An action is always associated with only one user account.
 Actions may include both actions performed by users they are associated with (e.g. **"write a post"**, **"leave a comment"**) and actions performed on such users or their content by other actors (e.g. **"get comment on a post"**, **"get a post banned"**).
-THe set of available action types can be customized using [gamification configuration file](./configuration.md#actions).
+The set of available action types can be customized using [gamification configuration file](./configuration.md#actions).
 
 Actions can be rewarded or penalized for with both internal tokens and **experience points** (aka **xp**).
 E.g. a user may get **10xp** and **1 token** for **writing a post** and be penalized by **15xp** and lose **2 tokens** for **getting the post banned** by moderator.
+
+## Achievements
+
+Achievements are unlocked by users once they perform a specific set of actions.
+For example, when there is an action **"write a post"**, there may be an achievement **"write a first post"** that unlocks once user performs their first action of the type.
+Once an achievement is unlocked, it can be neither unlocked again or taken away from the user.
 
 ## Account experience & levels
 
